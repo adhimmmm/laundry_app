@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../core/theme/theme_service.dart';
+import '../../../core/services/theme_service.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -125,24 +125,28 @@ class _HomeViewState extends State<HomeView> {
                               ],
                             ),
                             GestureDetector(
-  onTap: () {
-    ThemeService().switchTheme();
-  },
-  child: Container(
-    padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(
-      color: Theme.of(context).brightness == Brightness.dark
-          ? Colors.white.withOpacity(0.12)
-          : Colors.white.withOpacity(0.2),
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Icon(
-      Get.isDarkMode ? Icons.nightlight_round : Icons.sunny,
-      color: Colors.white,
-      size: 22,
-    ),
-  ),
-),
+                              onTap: () async {
+                                await ThemeService.switchTheme();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color:
+                                      Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white.withOpacity(0.12)
+                                      : Colors.white.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  Get.isDarkMode
+                                      ? Icons.nightlight_round
+                                      : Icons.sunny,
+                                  color: Colors.white,
+                                  size: 22,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
 

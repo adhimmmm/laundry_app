@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../../core/theme/theme_service.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -11,7 +13,6 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FC),
       extendBodyBehindAppBar: true,
 
       /// ===== BODY =====
@@ -123,34 +124,25 @@ class _HomeViewState extends State<HomeView> {
                                 ),
                               ],
                             ),
-                            Stack(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Icon(
-                                    Icons.sunny,
-                                    color: Colors.white,
-                                    size: 22,
-                                  ),
-                                ),
-                                Positioned(
-                                  right: 6,
-                                  top: 6,
-                                  child: Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFFFF5757),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            GestureDetector(
+  onTap: () {
+    ThemeService().switchTheme();
+  },
+  child: Container(
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Colors.white.withOpacity(0.12)
+          : Colors.white.withOpacity(0.2),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Icon(
+      Get.isDarkMode ? Icons.nightlight_round : Icons.sunny,
+      color: Colors.white,
+      size: 22,
+    ),
+  ),
+),
                           ],
                         ),
 

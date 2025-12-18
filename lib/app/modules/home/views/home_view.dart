@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import '../../../core/widgets/app_bottom_nav.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -9,13 +8,12 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> {
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FC),
       extendBodyBehindAppBar: true,
+
       /// ===== BODY =====
       body: CustomScrollView(
         slivers: [
@@ -52,8 +50,11 @@ class _HomeViewState extends State<HomeView> {
                                 SizedBox(height: 6),
                                 Row(
                                   children: [
-                                    Icon(Icons.location_on_rounded,
-                                        color: Colors.white70, size: 14),
+                                    Icon(
+                                      Icons.location_on_rounded,
+                                      color: Colors.white70,
+                                      size: 14,
+                                    ),
                                     SizedBox(width: 4),
                                     Text(
                                       'New York, USA',
@@ -172,8 +173,11 @@ class _HomeViewState extends State<HomeView> {
                           ),
                           child: Row(
                             children: const [
-                              Icon(Icons.search_rounded,
-                                  color: Color(0xFF5B8DEF), size: 22),
+                              Icon(
+                                Icons.search_rounded,
+                                color: Color(0xFF5B8DEF),
+                                size: 22,
+                              ),
                               SizedBox(width: 12),
                               Expanded(
                                 child: TextField(
@@ -187,8 +191,11 @@ class _HomeViewState extends State<HomeView> {
                                   ),
                                 ),
                               ),
-                              Icon(Icons.tune_rounded,
-                                  color: Color(0xFF5B8DEF), size: 22),
+                              Icon(
+                                Icons.tune_rounded,
+                                color: Color(0xFF5B8DEF),
+                                size: 22,
+                              ),
                             ],
                           ),
                         ),
@@ -257,28 +264,53 @@ class _HomeViewState extends State<HomeView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _sectionTitle('Services'),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          _ServiceItem(
-                            icon: Icons.local_laundry_service_rounded,
-                            label: 'Washing',
-                          ),
-                          _ServiceItem(
-                            icon: Icons.iron_rounded,
-                            label: 'Ironing',
-                          ),
-                          _ServiceItem(
-                            icon: Icons.dry_cleaning_rounded,
-                            label: 'Dry Clean',
-                          ),
-                          _ServiceItem(
-                            icon: Icons.cleaning_services_rounded,
-                            label: 'Carpet',
-                          ),
-                        ],
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+
+                        child: GridView.count(
+                          crossAxisCount: 3, // 3 ke kanan
+                          mainAxisSpacing: 12, // 👈 lebih rapat
+                          crossAxisSpacing: 12, // 👈 lebih rapat
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          children: const [
+                            _ServiceItem(
+                              icon: Icons.local_laundry_service_rounded,
+                              label: 'Washing',
+                            ),
+                            _ServiceItem(
+                              icon: Icons.iron_rounded,
+                              label: 'Ironing',
+                            ),
+                            _ServiceItem(
+                              icon: Icons.dry_cleaning_rounded,
+                              label: 'Dry Clean',
+                            ),
+                            _ServiceItem(
+                              icon: Icons.cleaning_services_rounded,
+                              label: 'Carpet',
+                            ),
+                            _ServiceItem(
+                              icon: Icons.cleaning_services_rounded,
+                              label: 'Sofa',
+                            ),
+                            _ServiceItem(
+                              icon: Icons.cleaning_services_rounded,
+                              label: 'Curtain',
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -298,7 +330,7 @@ class _HomeViewState extends State<HomeView> {
                         name: 'Spotless Attire',
                         rating: '4.9',
                         reviews: '2.4k',
-                
+
                         isOpen: true,
                       ),
                       const SizedBox(height: 12),
@@ -414,8 +446,10 @@ class _HomeViewState extends State<HomeView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFF9F43),
                       borderRadius: BorderRadius.circular(8),
@@ -503,8 +537,11 @@ class _HomeViewState extends State<HomeView> {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(Icons.star_rounded,
-                        color: Color(0xFFFFC107), size: 16),
+                    const Icon(
+                      Icons.star_rounded,
+                      color: Color(0xFFFFC107),
+                      size: 16,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       rating,
@@ -526,8 +563,10 @@ class _HomeViewState extends State<HomeView> {
                 ),
                 const SizedBox(height: 6),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: isOpen
                         ? const Color(0xFF10B981).withOpacity(0.1)
@@ -572,32 +611,26 @@ class _ServiceItem extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  const _ServiceItem({
-    required this.icon,
-    required this.label,
-  });
+  const _ServiceItem({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 68,
-          height: 68,
+          width: 56, // 👈 lebih kecil
+          height: 56,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFFF1F3F5), width: 1),
+            color: const Color(0xFF5B8DEF).withOpacity(0.1),
+            borderRadius: BorderRadius.circular(14),
           ),
-          child: Icon(
-            icon,
-            color: const Color(0xFF5B8DEF),
-            size: 28,
-          ),
+          child: Icon(icon, color: const Color(0xFF5B8DEF), size: 26),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Text(
           label,
+          textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w500,

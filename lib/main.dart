@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:firebase_core/firebase_core.dart';
 
+import 'firebase_options.dart';
 import 'app/routes/app_pages.dart';
 import 'app/core/theme/theme_service.dart';
+import 'app/data/services/notification_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 🔥 WAJIB — tanpa ini dark mode tidak akan pernah jalan
+  // 🔥 Wajib untuk GetX Theme (dark / light)
   await GetStorage.init();
+
+  // 🔥 Firebase init
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // 🔥 Firebase Cloud Messaging init
+  await FirebaseMessagingHandler().initPushNotification();
 
   runApp(const MyApp());
 }
@@ -47,7 +56,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
 
-      // 🔥 INI KUNCI DARK MODE GETX
+      // 🔥 Kunci dark mode GetX
       themeMode: ThemeService().themeMode,
 
       // ================= ROUTING =================

@@ -1,12 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+import 'firebase_options.dart';
 import 'app/routes/app_pages.dart';
 import 'app/core/services/theme_service.dart';
+import 'app/data/services/notification_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  final themeMode = await ThemeService.loadTheme(); 
+  // 🔥 Init GetStorage (kalau dipakai di tempat lain)
+  await GetStorage.init();
+
+  // 🔥 Load theme dari SharedPreferences
+  final ThemeMode themeMode = await ThemeService.loadTheme();
+
+  // 🔥 Init Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // 🔥 Init Firebase Cloud Messaging
+  await FirebaseMessagingHandler().initPushNotification();
 
   runApp(MyApp(themeMode: themeMode));
 }
@@ -22,7 +37,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Laundry App',
 
-      themeMode: themeMode, // 🔥 PAKAI HASIL SHARED PREF
+      // 🔥 PAKAI THEME DARI SHARED PREF
+      themeMode: themeMode,
 
       theme: ThemeData(
         brightness: Brightness.light,
@@ -36,6 +52,7 @@ class MyApp extends StatelessWidget {
         primaryColor: const Color(0xFF5B8DEF),
       ),
 
+      // ================= ROUTING =================
       initialRoute: Routes.MAIN_VIEW,
       getPages: AppPages.pages,
     );

@@ -41,6 +41,9 @@ dependencies:
   hive_flutter: ^1.1.0 
   supabase_flutter: ^2.5.5
    
+  firebase_core: ^4.2.1
+  firebase_messaging: ^16.0.4
+  flutter_local_notifications: ^17.2.3
 
 dev_dependencies:
   flutter_test:

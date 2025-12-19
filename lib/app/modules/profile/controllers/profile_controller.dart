@@ -4,7 +4,6 @@ import '../../auth/controllers/auth_controller.dart';
 
 class ProfileController extends GetxController {
   final SupabaseClient _client = Supabase.instance.client;
-
   final Rx<User?> user = Rx<User?>(null);
   final RxBool isUpdating = false.obs;
 

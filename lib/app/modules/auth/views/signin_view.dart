@@ -103,7 +103,6 @@ class _SigninViewState extends State<SigninView> {
           const SizedBox(height: 24),
 
           /// LOGIN BUTTON
-          /// LOGIN BUTTON
           Obx(
             () => SizedBox(
               width: double.infinity,

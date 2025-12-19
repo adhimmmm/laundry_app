@@ -5,19 +5,24 @@ import '../../../routes/app_pages.dart';
 
 class AuthController extends GetxController {
   final SupabaseService _supabase = SupabaseService();
-
   final Rx<User?> user = Rx<User?>(null);
   final RxBool isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-
     user.value = _supabase.currentUser;
+  }
 
-    /// AUTO LOGIN CHECK
+  @override
+  void onReady() {
+    super.onReady();
+    /// AUTO LOGIN CHECK diletakkan di onReady agar UI sudah siap
     if (user.value != null) {
-      Get.offAllNamed(Routes.MAIN_VIEW);
+      // Pastikan kita tidak melakukan navigasi berulang jika sudah di MAIN_VIEW
+      if (Get.currentRoute != Routes.MAIN_VIEW) {
+        Get.offAllNamed(Routes.MAIN_VIEW);
+      }
     }
   }
 

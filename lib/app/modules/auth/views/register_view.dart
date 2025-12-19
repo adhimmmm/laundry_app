@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:loundry_app/app/modules/auth/controllers/auth_controller.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key, required this.onLoginTap});
@@ -14,6 +17,7 @@ class _RegisterViewState extends State<RegisterView> {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final authController = Get.find<AuthController>();
 
   bool isPasswordHidden = true;
 
@@ -27,6 +31,7 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -104,29 +109,50 @@ class _RegisterViewState extends State<RegisterView> {
 
               /// SIGN UP BUTTON
               SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // TODO: register logic
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5B8DEF),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28),
-                    ),
-                  ),
-                  child: const Text(
-                    'Create Account',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+              width: double.infinity,
+              height: 56,
+              // 2. Gunakan Obx agar tombol reaktif terhadap isLoading
+              child: Obx(() => ElevatedButton(
+                onPressed: authController.isLoading.value
+                    ? null // Nonaktifkan tombol jika sedang loading
+                    : () {
+                        // 3. Panggil fungsi register
+                        if (emailController.text.isNotEmpty && 
+                            passwordController.text.isNotEmpty) {
+                          authController.register(
+                            emailController.text.trim(),
+                            passwordController.text.trim(),
+                          );
+                        } else {
+                          Get.snackbar("Error", "Please fill all fields");
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF5B8DEF),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(28),
                   ),
                 ),
-              ),
+                child: authController.isLoading.value
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Text(
+                        'Create Account',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              )),
+            ),
 
               const SizedBox(height: 32),
 

@@ -292,27 +292,27 @@ class _HomeViewState extends State<HomeView> {
                           physics: const NeverScrollableScrollPhysics(),
                           children: const [
                             _ServiceItem(
-                              icon: Icons.local_laundry_service_rounded,
+                              imagePath: 'assets/home/washing-machine.png',
                               label: 'Washing',
                             ),
                             _ServiceItem(
-                              icon: Icons.iron_rounded,
+                              imagePath: 'assets/home/iron.png',
                               label: 'Ironing',
                             ),
                             _ServiceItem(
-                              icon: Icons.dry_cleaning_rounded,
+                              imagePath: 'assets/home/dry-cleaning.png',
                               label: 'Dry Clean',
                             ),
                             _ServiceItem(
-                              icon: Icons.cleaning_services_rounded,
+                              imagePath: 'assets/home/washing-machine.png',
                               label: 'Carpet',
                             ),
                             _ServiceItem(
-                              icon: Icons.cleaning_services_rounded,
+                              imagePath: 'assets/home/washing-machine.png',
                               label: 'Sofa',
                             ),
                             _ServiceItem(
-                              icon: Icons.cleaning_services_rounded,
+                              imagePath: 'assets/home/washing-machine.png',
                               label: 'Curtain',
                             ),
                           ],
@@ -614,10 +614,10 @@ class _HomeViewState extends State<HomeView> {
 }
 
 class _ServiceItem extends StatelessWidget {
-  final IconData icon;
+  final String imagePath; // Mengubah IconData menjadi String path
   final String label;
 
-  const _ServiceItem({required this.icon, required this.label});
+  const _ServiceItem({required this.imagePath, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -625,13 +625,18 @@ class _ServiceItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 56, // 👈 lebih kecil
+          width: 56,
           height: 56,
+          padding: const EdgeInsets.all(12), // Memberi ruang agar gambar tidak menempel ke pinggir
           decoration: BoxDecoration(
             color: const Color(0xFF5B8DEF).withOpacity(0.1),
             borderRadius: BorderRadius.circular(14),
           ),
-          child: Icon(icon, color: const Color(0xFF5B8DEF), size: 26),
+          child: Image.asset(
+            imagePath,
+            fit: BoxFit.contain, // Agar gambar menyesuaikan ukuran container dengan rapi
+            // color: const Color(0xFF5B8DEF), // Opsional: gunakan ini jika gambar kamu adalah icon PNG transparan yang ingin diwarnai biru
+          ),
         ),
         const SizedBox(height: 6),
         Text(

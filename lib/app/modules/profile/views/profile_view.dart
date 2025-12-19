@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:loundry_app/app/modules/auth/controllers/auth_controller.dart';
 import '../controllers/profile_controller.dart';
 
 class ProfileView extends GetView<ProfileController> {
@@ -7,6 +8,7 @@ class ProfileView extends GetView<ProfileController> {
 
   @override
   Widget build(BuildContext context) {
+    final AuthController authController = Get.put(AuthController());
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
@@ -60,7 +62,7 @@ class ProfileView extends GetView<ProfileController> {
               width: double.infinity,
               height: 54,
               child: OutlinedButton(
-                onPressed: controller.logout,
+                onPressed: () => {authController.logout()},
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: Colors.red),
                   shape: RoundedRectangleBorder(

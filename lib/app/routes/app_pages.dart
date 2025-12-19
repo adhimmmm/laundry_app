@@ -1,5 +1,7 @@
 import 'package:get/get.dart';
 
+import '../modules/admin_dashborad/bindings/admin_dashborad_binding.dart';
+import '../modules/admin_dashborad/views/admin_dashborad_view.dart';
 import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/auth_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -55,6 +57,11 @@ class AppPages {
       name: _Paths.NOTIFICATION,
       page: () => const NotificationView(),
       binding: NotificationBinding(),
+    ),
+    GetPage(
+      name: _Paths.ADMIN_DASHBORAD,
+      page: () => const AdminDashboradView(),
+      binding: AdminDashboradBinding(),
     ),
   ];
 }

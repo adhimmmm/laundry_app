@@ -311,15 +311,15 @@ class _HomeViewState extends State<HomeView> {
                               label: 'Dry Clean',
                             ),
                             _ServiceItem(
-                              imagePath: 'assets/home/washing-machine.png',
+                              imagePath: 'assets/home/power-washing.png',
                               label: 'Carpet',
                             ),
                             _ServiceItem(
-                              imagePath: 'assets/home/washing-machine.png',
+                              imagePath: 'assets/home/sofa.png',
                               label: 'Sofa',
                             ),
                             _ServiceItem(
-                              imagePath: 'assets/home/washing-machine.png',
+                              imagePath: 'assets/home/dice.png',
                               label: 'Curtain',
                             ),
                           ],
@@ -341,24 +341,17 @@ class _HomeViewState extends State<HomeView> {
                       const SizedBox(height: 12),
                       _popularProvider(
                         name: 'Spotless Attire',
-                        rating: '4.9',
-                        reviews: '2.4k',
-
-                        isOpen: true,
+                        reviews: '1.8k',
                       ),
                       const SizedBox(height: 12),
                       _popularProvider(
                         name: 'Fresh & Clean Laundry',
-                        rating: '4.8',
                         reviews: '1.8k',
-                        isOpen: true,
                       ),
                       const SizedBox(height: 12),
                       _popularProvider(
                         name: 'Perfect Press Service',
-                        rating: '4.7',
                         reviews: '1.2k',
-                        isOpen: false,
                       ),
                       const SizedBox(height: 20),
                     ],
@@ -505,9 +498,7 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _popularProvider({
     required String name,
-    required String rating,
     required String reviews,
-    required bool isOpen,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -550,53 +541,26 @@ class _HomeViewState extends State<HomeView> {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.star_rounded,
-                      color: Color(0xFFFFC107),
-                      size: 16,
-                    ),
-                    const SizedBox(width: 4),
                     Text(
-                      rating,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
+                      "Price:",
+                      style: TextStyle(
                         fontSize: 13,
-                        color: Color(0xFF1A1D1F),
+                        fontWeight: FontWeight.w500,
+                        color: Color.fromARGB(255, 32, 33, 35)
                       ),
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '($reviews reviews)',
+                      reviews,
                       style: const TextStyle(
                         fontSize: 12,
-                        color: Color(0xFF6C757D),
+                        fontWeight: FontWeight.w500,
+                        color: Color.fromARGB(255, 51, 54, 51),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isOpen
-                        ? const Color(0xFF10B981).withOpacity(0.1)
-                        : const Color(0xFFEF4444).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    isOpen ? 'Open Now' : 'Closed',
-                    style: TextStyle(
-                      color: isOpen
-                          ? const Color(0xFF10B981)
-                          : const Color(0xFFEF4444),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
               ],
             ),
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loundry_app/app/modules/auth/controllers/auth_controller.dart';
+import 'package:loundry_app/app/routes/app_pages.dart';
 import '../controllers/profile_controller.dart';
 import '../../../core/services/http_service.dart';
 
@@ -51,6 +52,15 @@ class ProfileView extends GetView<ProfileController> {
               title: 'Privacy Policy',
               subtitle: 'Read our privacy policy',
               onTap: () => _showPrivacyDialog(),
+            ),
+
+            _menuCard(
+              icon: Icons.storage,
+              title: 'Admin Storage',
+              subtitle: 'Management storage and  services',
+              onTap: () => {
+                Get.toNamed(Routes.ADMIN_DASHBORAD),
+              },
             ),
 
             const SizedBox(height: 40),

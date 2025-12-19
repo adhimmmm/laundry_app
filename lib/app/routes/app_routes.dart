@@ -10,6 +10,7 @@ abstract class Routes {
   static const AUTH = _Paths.AUTH;
   static const LAUNDRY_MAP = _Paths.LAUNDRY_MAP;
   static const NOTIFICATION = _Paths.NOTIFICATION;
+  static const ADMIN_DASHBORAD = _Paths.ADMIN_DASHBORAD;
 }
 
 abstract class _Paths {
@@ -21,4 +22,5 @@ abstract class _Paths {
   static const AUTH = '/auth';
   static const LAUNDRY_MAP = '/laundry-map';
   static const NOTIFICATION = '/notification';
+  static const ADMIN_DASHBORAD = '/admin-dashborad';
 }

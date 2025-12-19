@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loundry_app/app/modules/auth/controllers/auth_controller.dart';
 import '../controllers/profile_controller.dart';
+import '/app/data/services/http_service.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({super.key});
@@ -10,10 +11,7 @@ class ProfileView extends GetView<ProfileController> {
   Widget build(BuildContext context) {
     final AuthController authController = Get.put(AuthController());
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Profile'), elevation: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -93,27 +91,15 @@ class ProfileView extends GetView<ProfileController> {
           CircleAvatar(
             radius: 42,
             backgroundColor: Colors.blue.withOpacity(0.1),
-            child: const Icon(
-              Icons.person,
-              size: 42,
-              color: Colors.blue,
-            ),
+            child: const Icon(Icons.person, size: 42, color: Colors.blue),
           ),
           const SizedBox(height: 12),
           Text(
             controller.fullName,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
-          Text(
-            controller.email,
-            style: TextStyle(
-              color: Colors.grey.shade600,
-            ),
-          ),
+          Text(controller.email, style: TextStyle(color: Colors.grey.shade600)),
         ],
       ),
     );
@@ -147,23 +133,17 @@ class ProfileView extends GetView<ProfileController> {
   // ================= DIALOGS =================
 
   void _showEditNameDialog() {
-    final nameController =
-        TextEditingController(text: controller.fullName);
+    final nameController = TextEditingController(text: controller.fullName);
 
     Get.dialog(
       AlertDialog(
         title: const Text('Update Name'),
         content: TextField(
           controller: nameController,
-          decoration: const InputDecoration(
-            labelText: 'Full Name',
-          ),
+          decoration: const InputDecoration(labelText: 'Full Name'),
         ),
         actions: [
-          TextButton(
-            onPressed: Get.back,
-            child: const Text('Cancel'),
-          ),
+          TextButton(onPressed: Get.back, child: const Text('Cancel')),
           Obx(
             () => ElevatedButton(
               onPressed: controller.isUpdating.value
@@ -190,18 +170,49 @@ class ProfileView extends GetView<ProfileController> {
     Get.dialog(
       AlertDialog(
         title: const Text('FAQ'),
-        content: const SingleChildScrollView(
-          child: Text(
-            'Q: How to order laundry?\n'
-            'A: Choose service and place order.\n\n'
-            'Q: How long does it take?\n'
-            'A: Usually 1–2 days.\n\n'
-            'Q: How to contact support?\n'
-            'A: Via Help Center.',
+        content: SizedBox(
+          width: double.maxFinite,
+          child: FutureBuilder<List<dynamic>>(
+            future: HttpService.getFaqs(),
+            builder: (context, snapshot) {
+              // loading
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              // error
+              if (snapshot.hasError) {
+                return const Text('Gagal memuat FAQ');
+              }
+
+              final faqs = snapshot.data!;
+
+              return SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: faqs.map((faq) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Q: ${faq['question']}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4),
+                          Text('A: ${faq['answer']}'),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              );
+            },
           ),
         ),
         actions: [
-          TextButton(onPressed: Get.back, child: const Text('Close')),
+          TextButton(onPressed: () => Get.back(), child: const Text('Close')),
         ],
       ),
     );
@@ -218,9 +229,7 @@ class ProfileView extends GetView<ProfileController> {
             'and will not be shared with third parties.',
           ),
         ),
-        actions: [
-          TextButton(onPressed: Get.back, child: const Text('Close')),
-        ],
+        actions: [TextButton(onPressed: Get.back, child: const Text('Close'))],
       ),
     );
   }

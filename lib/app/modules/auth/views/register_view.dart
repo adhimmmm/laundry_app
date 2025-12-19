@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 class RegisterView extends StatefulWidget {
-  const RegisterView({super.key});
+  const RegisterView({super.key, required this.onLoginTap});
+  final VoidCallback onLoginTap;
+
+  // 2. TAMBAHKAN KE CONSTRUCTOR
 
   @override
   State<RegisterView> createState() => _RegisterViewState();
@@ -12,17 +14,14 @@ class _RegisterViewState extends State<RegisterView> {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
 
   bool isPasswordHidden = true;
-  bool isConfirmPasswordHidden = true;
 
   @override
   void dispose() {
     nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
-    confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -100,30 +99,7 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
               ),
 
-              const SizedBox(height: 20),
-
-              /// CONFIRM PASSWORD
-              _inputField(
-                label: 'Confirm Password',
-                hint: '••••••••••••',
-                controller: confirmPasswordController,
-                obscureText: isConfirmPasswordHidden,
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    isConfirmPasswordHidden
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
-                    color: Colors.grey.shade600,
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      isConfirmPasswordHidden =
-                          !isConfirmPasswordHidden;
-                    });
-                  },
-                ),
-              ),
-
+      
               const SizedBox(height: 32),
 
               /// SIGN UP BUTTON
@@ -166,9 +142,7 @@ class _RegisterViewState extends State<RegisterView> {
                     ),
                   ),
                   GestureDetector(
-                    onTap: () {
-                      Get.back();
-                    },
+                    onTap:widget.onLoginTap,
                     child: const Text(
                       'Sign In',
                       style: TextStyle(

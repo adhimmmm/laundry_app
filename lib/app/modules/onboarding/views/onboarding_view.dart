@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:loundry_app/app/routes/app_pages.dart';
 import '../controllers/onboarding_controller.dart';
 
 class OnboardingView extends GetView<OnboardingController> {
@@ -49,7 +48,7 @@ class OnboardingView extends GetView<OnboardingController> {
                 right: 16,
                 child: TextButton(
                   onPressed: () {
-                    Get.offAllNamed(Routes.SIGNIN);
+                    //registes
                   },
                   child: const Text(
                     'Skip',
@@ -202,7 +201,7 @@ class OnboardingView extends GetView<OnboardingController> {
               isPrimary: true,
               onTap: () {
                 if (controller.currentPage.value == 2) {
-                  Get.offAllNamed(Routes.SIGNIN);
+                  //login
                 } else {
                   controller.pageController.nextPage(
                     duration: const Duration(milliseconds: 300),

@@ -1,48 +1,149 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
+
+import '../../routes/app_pages.dart';
 
 /// 🔥 WAJIB: handler background HARUS top-level
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('📦 Background message received');
-  print('Title: ${message.notification?.title}');
-  print('Body: ${message.notification?.body}');
+  log('📦 BACKGROUND MESSAGE: ${message.notification?.title}');
 }
 
-class FirebaseMessagingHandler {
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+class NotificationService extends GetxService {
+  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _localNotif =
+      FlutterLocalNotificationsPlugin();
 
-  Future<void> initPushNotification() async {
-    // ================= PERMISSION =================
-    NotificationSettings settings = await _firebaseMessaging.requestPermission(
+  /// ================= ANDROID CHANNEL =================
+  /// ⚠️ SOUND HARUS ADA DI: android/app/src/main/res/raw/
+  static const AndroidNotificationChannel _androidChannel =
+      AndroidNotificationChannel(
+        'channel_chat_like',
+        'Chat Like Notification',
+        description: 'Notification like WhatsApp / Shopee',
+        importance: Importance.max,
+        playSound: true,
+        sound: RawResourceAndroidNotificationSound('notif'),
+      );
+
+  /// ================= INIT =================
+  Future<NotificationService> init() async {
+    await _requestPermission();
+    await _initLocalNotification();
+    await _getToken();
+
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+    _listenForeground();
+    _listenNotificationClick();
+
+    return this;
+  }
+
+  /// ================= PERMISSION =================
+  Future<void> _requestPermission() async {
+    final settings = await _fcm.requestPermission(
       alert: true,
       badge: true,
       sound: true,
     );
 
-    print('🔐 Authorization status: ${settings.authorizationStatus}');
+    log('🔐 PERMISSION: ${settings.authorizationStatus}');
+  }
 
-    // ================= TOKEN =================
-    String? token = await _firebaseMessaging.getToken();
-    print('🔥 FCM Token: $token');
-
-    // ================= TERMINATED =================
-    RemoteMessage? initialMessage = await FirebaseMessaging.instance
-        .getInitialMessage();
-
-    if (initialMessage != null) {
-      print(
-        '🚀 App opened from terminated by notification: ${initialMessage.notification?.title}',
-      );
+  /// ================= TOKEN =================
+  Future<void> _getToken() async {
+    try {
+      final token = await _fcm.getToken();
+      log('🔥 FCM TOKEN: $token');
+    } catch (e) {
+      log('❌ TOKEN ERROR: $e');
     }
+  }
 
-    // ================= FOREGROUND =================
+  /// ================= LOCAL NOTIFICATION INIT =================
+  Future<void> _initLocalNotification() async {
+    const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const iosInit = DarwinInitializationSettings();
+
+    const initSettings = InitializationSettings(
+      android: androidInit,
+      iOS: iosInit,
+    );
+
+    await _localNotif.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: (response) {
+        if (response.payload != null) {
+          _handlePayload(response.payload!);
+        }
+      },
+    );
+
+    // 🔥 CREATE CHANNEL (WAJIB ANDROID 8+)
+    await _localNotif
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.createNotificationChannel(_androidChannel);
+  }
+
+  /// ================= FOREGROUND =================
+  void _listenForeground() {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('📲 Foreground message received');
-      print('Title: ${message.notification?.title}');
-      print('Body: ${message.notification?.body}');
+      final notification = message.notification;
+      if (notification == null) return;
+
+      log('📲 FOREGROUND: ${notification.title}');
+
+      _localNotif.show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            _androidChannel.id,
+            _androidChannel.name,
+            channelDescription: _androidChannel.description,
+            importance: Importance.max,
+            priority: Priority.high,
+            sound: _androidChannel.sound,
+            playSound: true,
+          ),
+        ),
+        payload: jsonEncode(message.data),
+      );
+    });
+  }
+
+  /// ================= CLICK HANDLER =================
+  void _listenNotificationClick() {
+    // BACKGROUND
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      _handlePayload(jsonEncode(message.data));
     });
 
-    // ================= BACKGROUND =================
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    // TERMINATED
+    _fcm.getInitialMessage().then((message) {
+      if (message != null) {
+        _handlePayload(jsonEncode(message.data));
+      }
+    });
+  }
+
+  /// ================= PAYLOAD HANDLER =================
+  void _handlePayload(String payload) {
+    final data = jsonDecode(payload);
+
+    log('📦 PAYLOAD: $data');
+
+    /// 🎯 SEMUA NOTIF → MAIN VIEW
+    if (Get.currentRoute != Routes.MAIN_VIEW) {
+      Get.offAllNamed(Routes.MAIN_VIEW);
+    }
   }
 }

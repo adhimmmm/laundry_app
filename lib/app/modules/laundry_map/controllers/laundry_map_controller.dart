@@ -3,11 +3,14 @@ import 'package:latlong2/latlong.dart';
 import 'package:loundry_app/app/core/services/location.service.dart';
 
 class LaundryMapController extends GetxController {
-  final LocationService _locationService = LocationService();
+  final LocationService _locationService = Get.find();
 
   final userPosition = Rxn<LatLng>();
   final laundryPosition = Rxn<LatLng>();
+  final distanceToLaundry = RxnDouble();
+
   final isLoading = true.obs;
+  final errorMessage = RxnString();
 
   @override
   void onInit() {
@@ -16,13 +19,23 @@ class LaundryMapController extends GetxController {
   }
 
   Future<void> loadMapData() async {
-    try {
-      laundryPosition.value =
-          _locationService.getLaundryLocation();
+    isLoading.value = true;
+    errorMessage.value = null;
 
-      userPosition.value =
-          await _locationService.getUserLocation();
-    } catch (_) {
+    try {
+      final laundry = _locationService.getLaundryLocation();
+      final user = await _locationService.getUserLocation();
+
+      laundryPosition.value = laundry;
+      userPosition.value = user;
+
+      distanceToLaundry.value =
+          _locationService.calculateDistance(
+        user: user,
+        laundry: laundry,
+      );
+    } catch (e) {
+      errorMessage.value = 'Gagal mendapatkan lokasi pengguna';
       userPosition.value = null;
     } finally {
       isLoading.value = false;

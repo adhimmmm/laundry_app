@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:loundry_app/app/modules/laundry_map/bindings/laundry_map_binding.dart';
+import 'package:loundry_app/app/modules/laundry_map/views/laundry_map_view.dart';
 import '../../../core/services/theme_service.dart';
 
 class HomeView extends StatefulWidget {
@@ -39,8 +41,8 @@ class _HomeViewState extends State<HomeView> {
                           children: [
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
-                                Text(
+                              children: [
+                                const Text(
                                   'Hi, Welcome Back',
                                   style: TextStyle(
                                     color: Colors.white,
@@ -48,23 +50,31 @@ class _HomeViewState extends State<HomeView> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(height: 6),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.location_on_rounded,
-                                      color: Colors.white70,
-                                      size: 14,
-                                    ),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      'New York, USA',
-                                      style: TextStyle(
+                                const SizedBox(height: 6),
+                                InkWell(
+                                  onTap: () {
+                                    Get.to(
+                                      () => const LaundryMapView(),
+                                      binding: LaundryMapBinding(),
+                                    );
+                                  },
+                                  child: const Row(
+                                    children: const [
+                                      Icon(
+                                        Icons.location_on_rounded,
                                         color: Colors.white70,
-                                        fontSize: 13,
+                                        size: 14,
                                       ),
-                                    ),
-                                  ],
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'New York, USA',
+                                        style: TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),

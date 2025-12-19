@@ -1,55 +1,54 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class LocationService {
+  static const LatLng _laundryPosition =LatLng(-7.966620, 112.632632);
 
-  /// ===== LOKASI LAUNDRY (1 TITIK) =====
-  final LatLng _laundryPosition =
-      const LatLng(-7.966620, 112.632632); 
+  LatLng getLaundryLocation() => _laundryPosition;
 
-  LatLng getLaundryLocation() {
-    return _laundryPosition;
-  }
+  Future<bool> _handlePermission() async {
+    final serviceEnabled =
+        await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return false;
 
-  /// ===== PERMISSION & USER LOCATION =====
-  Future<bool> _checkPermission() async {
-    if (!await Geolocator.isLocationServiceEnabled()) return false;
+    LocationPermission permission =
+        await Geolocator.checkPermission();
 
-    var status = await Permission.location.status;
-    if (status.isDenied) {
-      status = await Permission.location.request();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
     }
 
-    if (status.isPermanentlyDenied) {
-      openAppSettings();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
       return false;
     }
-    return status.isGranted;
+
+    return true;
   }
 
   Future<LatLng> getUserLocation() async {
-    final granted = await _checkPermission();
-    if (!granted) {
-      throw Exception('Location permission denied');
+    final hasPermission = await _handlePermission();
+    if (!hasPermission) {
+      throw Exception('Location permission not granted');
     }
 
     final position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.high,
+      timeLimit: const Duration(seconds: 10),
     );
 
     return LatLng(position.latitude, position.longitude);
   }
 
-  /// ===== HITUNG JARAK USER → LAUNDRY =====
-  Future<double> getDistanceToLaundry() async {
-    final user = await getUserLocation();
-
+  double calculateDistance({
+    required LatLng user,
+    required LatLng laundry,
+  }) {
     return Geolocator.distanceBetween(
       user.latitude,
       user.longitude,
-      _laundryPosition.latitude,
-      _laundryPosition.longitude,
+      laundry.latitude,
+      laundry.longitude,
     );
   }
 }

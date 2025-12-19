@@ -2,16 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:loundry_app/app/core/models/notification_model.dart';
+import 'package:loundry_app/app/core/services/notification_hive_service.dart';
 
 import 'firebase_options.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app/routes/app_pages.dart';
 import 'app/core/services/theme_service.dart';
-import 'app/data/services/notification_handler.dart'; // ⬅️ GANTI INI
+import 'app/core/models/notification_handler.dart'; 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+  Hive.registerAdapter(NotificationModelAdapter());
+
+  final notifHive = NotificationHiveService();
+  await notifHive.init();
+
+  Get.put(notifHive);
 
   // 🔥 Init GetStorage
   await GetStorage.init();

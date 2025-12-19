@@ -4,6 +4,8 @@ import 'dart:developer';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:loundry_app/app/core/models/notification_model.dart';
+import 'package:loundry_app/app/core/services/notification_hive_service.dart';
 
 import '../../routes/app_pages.dart';
 
@@ -93,32 +95,41 @@ class NotificationService extends GetxService {
   }
 
   /// ================= FOREGROUND =================
-  void _listenForeground() {
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      final notification = message.notification;
-      if (notification == null) return;
+ void _listenForeground() {
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    final notification = message.notification;
+    if (notification == null) return;
 
-      log('📲 FOREGROUND: ${notification.title}');
+    final hive = Get.find<NotificationHiveService>();
 
-      _localNotif.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            _androidChannel.id,
-            _androidChannel.name,
-            channelDescription: _androidChannel.description,
-            importance: Importance.max,
-            priority: Priority.high,
-            sound: _androidChannel.sound,
-            playSound: true,
-          ),
+    hive.add(
+      NotificationModel(
+        title: notification.title ?? '',
+        body: notification.body ?? '',
+        data: message.data,
+        receivedAt: DateTime.now(),
+      ),
+    );
+
+    _localNotif.show(
+      notification.hashCode,
+      notification.title,
+      notification.body,
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          _androidChannel.id,
+          _androidChannel.name,
+          channelDescription: _androidChannel.description,
+          importance: Importance.max,
+          priority: Priority.high,
+          sound: _androidChannel.sound,
         ),
-        payload: jsonEncode(message.data),
-      );
-    });
-  }
+      ),
+      payload: jsonEncode(message.data),
+    );
+  });
+}
+
 
   /// ================= CLICK HANDLER =================
   void _listenNotificationClick() {

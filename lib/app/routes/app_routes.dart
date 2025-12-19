@@ -9,6 +9,7 @@ abstract class Routes {
   static const PROFILE = _Paths.PROFILE;
   static const AUTH = _Paths.AUTH;
   static const LAUNDRY_MAP = _Paths.LAUNDRY_MAP;
+  static const NOTIFICATION = _Paths.NOTIFICATION;
 }
 
 abstract class _Paths {
@@ -19,4 +20,5 @@ abstract class _Paths {
   static const PROFILE = '/profile';
   static const AUTH = '/auth';
   static const LAUNDRY_MAP = '/laundry-map';
+  static const NOTIFICATION = '/notification';
 }

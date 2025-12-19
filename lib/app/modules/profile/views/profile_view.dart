@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loundry_app/app/modules/auth/controllers/auth_controller.dart';
 import '../controllers/profile_controller.dart';
-import '/app/data/services/http_service.dart';
+import '../../../core/services/http_service.dart';
 
 class ProfileView extends GetView<ProfileController> {
   const ProfileView({super.key});

@@ -8,6 +8,8 @@ import '../modules/laundry_map/bindings/laundry_map_binding.dart';
 import '../modules/laundry_map/views/laundry_map_view.dart';
 import '../modules/main_view/bindings/main_view_binding.dart';
 import '../modules/main_view/views/main_view_view.dart';
+import '../modules/notification/bindings/notification_binding.dart';
+import '../modules/notification/views/notification_view.dart';
 import '../modules/onboarding/bindings/onboarding_binding.dart';
 import '../modules/onboarding/views/onboarding_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
@@ -48,6 +50,11 @@ class AppPages {
       name: _Paths.LAUNDRY_MAP,
       page: () => const LaundryMapView(),
       binding: LaundryMapBinding(),
+    ),
+    GetPage(
+      name: _Paths.NOTIFICATION,
+      page: () => const NotificationView(),
+      binding: NotificationBinding(),
     ),
   ];
 }

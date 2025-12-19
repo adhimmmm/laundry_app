@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loundry_app/app/modules/laundry_map/bindings/laundry_map_binding.dart';
 import 'package:loundry_app/app/modules/laundry_map/views/laundry_map_view.dart';
+import 'package:loundry_app/app/routes/app_pages.dart';
 import '../../../core/services/theme_service.dart';
 
 class HomeView extends StatefulWidget {
@@ -78,33 +79,39 @@ class _HomeViewState extends State<HomeView> {
                                 ),
                               ],
                             ),
-                            Stack(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.15),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: const Icon(
-                                    Icons.notifications_none_rounded,
-                                    color: Colors.white,
-                                    size: 22,
-                                  ),
-                                ),
-                                Positioned(
-                                  right: 6,
-                                  top: 6,
-                                  child: Container(
-                                    width: 8,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFFFF5757),
-                                      shape: BoxShape.circle,
+                            InkWell(
+                              borderRadius: BorderRadius.circular(12),
+                              onTap: () {
+                                Get.toNamed(Routes.NOTIFICATION);
+                              },
+                              child: Stack(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.15),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.notifications_none_rounded,
+                                      color: Colors.white,
+                                      size: 22,
                                     ),
                                   ),
-                                ),
-                              ],
+                                  Positioned(
+                                    right: 6,
+                                    top: 6,
+                                    child: Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFFF5757),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             Stack(
                               children: [
@@ -627,14 +634,17 @@ class _ServiceItem extends StatelessWidget {
         Container(
           width: 56,
           height: 56,
-          padding: const EdgeInsets.all(12), // Memberi ruang agar gambar tidak menempel ke pinggir
+          padding: const EdgeInsets.all(
+            12,
+          ), // Memberi ruang agar gambar tidak menempel ke pinggir
           decoration: BoxDecoration(
             color: const Color(0xFF5B8DEF).withOpacity(0.1),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Image.asset(
             imagePath,
-            fit: BoxFit.contain, // Agar gambar menyesuaikan ukuran container dengan rapi
+            fit: BoxFit
+                .contain, // Agar gambar menyesuaikan ukuran container dengan rapi
             // color: const Color(0xFF5B8DEF), // Opsional: gunakan ini jika gambar kamu adalah icon PNG transparan yang ingin diwarnai biru
           ),
         ),

@@ -4,6 +4,8 @@ import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/auth_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/laundry_map/bindings/laundry_map_binding.dart';
+import '../modules/laundry_map/views/laundry_map_view.dart';
 import '../modules/main_view/bindings/main_view_binding.dart';
 import '../modules/main_view/views/main_view_view.dart';
 import '../modules/onboarding/bindings/onboarding_binding.dart';
@@ -41,6 +43,11 @@ class AppPages {
       name: _Paths.AUTH,
       page: () => const AuthView(),
       binding: AuthBinding(),
+    ),
+    GetPage(
+      name: _Paths.LAUNDRY_MAP,
+      page: () => const LaundryMapView(),
+      binding: LaundryMapBinding(),
     ),
   ];
 }

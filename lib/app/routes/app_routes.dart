@@ -8,6 +8,7 @@ abstract class Routes {
   static const MAIN_VIEW = _Paths.MAIN_VIEW;
   static const PROFILE = _Paths.PROFILE;
   static const AUTH = _Paths.AUTH;
+  static const LAUNDRY_MAP = _Paths.LAUNDRY_MAP;
 }
 
 abstract class _Paths {
@@ -17,4 +18,5 @@ abstract class _Paths {
   static const MAIN_VIEW = '/main-view';
   static const PROFILE = '/profile';
   static const AUTH = '/auth';
+  static const LAUNDRY_MAP = '/laundry-map';
 }

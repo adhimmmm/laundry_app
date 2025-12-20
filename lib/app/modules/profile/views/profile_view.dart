@@ -20,7 +20,7 @@ class ProfileView extends GetView<ProfileController> {
       appBar: AppBar(
         title: const Text('Profile'),
         elevation: 0,
-        backgroundColor: Colors.blue,
+        backgroundColor: isDark ? Colors.grey[900] : Colors.grey[50],
         centerTitle: true,
       ),
       body: SingleChildScrollView(

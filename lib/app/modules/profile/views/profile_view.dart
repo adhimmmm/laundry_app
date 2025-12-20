@@ -1,4 +1,4 @@
-import 'dart:io';
+
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -377,7 +377,6 @@ Obx(() {
   void _showEditProfile() {
   final nameController = TextEditingController(text: controller.name);
   final emailController = TextEditingController(text: controller.email);
-  controller.imagePath.value = ''; // Reset imagePath setiap buka dialog
 
   Get.dialog(
     Dialog(
@@ -390,37 +389,6 @@ Obx(() {
             children: [
               const Text('Edit Profile', 
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
-
-              // --- FOTO PROFIL EDITABLE ---
-              Obx(() => GestureDetector(
-                onTap: () => controller.pickImage(),
-                child: Stack(
-                  children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.blue.shade50,
-                      backgroundImage: controller.imagePath.value.isNotEmpty
-                          ? FileImage(File(controller.imagePath.value))
-                          : (controller.imageUrl.isNotEmpty 
-                              ? NetworkImage(controller.imageUrl) 
-                              : null) as ImageProvider?,
-                      child: controller.imagePath.value.isEmpty && controller.imageUrl.isEmpty
-                          ? const Icon(Icons.camera_alt, size: 40, color: Colors.blue)
-                          : null,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
-                        child: const Icon(Icons.edit, size: 18, color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              )),
 
               const SizedBox(height: 25),
               _buildEditTextField(nameController, 'Full Name', Icons.person),

@@ -24,6 +24,10 @@ class AdminDashboradController extends GetxController {
       final data = await supabase.from('laundry_services').select();
       print("Data yang didapat: $data");
       listData.assignAll(data);
+
+      // 🔍 DEBUG IMAGE URL
+    print('IMAGE URL LIST:');
+    print(listData.map((e) => e['image_url']).toList());
     } catch (e) {
       print("Error Supabase: $e");
     } finally {
@@ -77,56 +81,85 @@ class AdminDashboradController extends GetxController {
 
   // Fungsi Upload ke Supabase Storage
  Future<String?> uploadImage(File imageFile) async {
-    try {
-      final String fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final String path = 'uploads/$fileName';
+  try {
+    final fileName =
+        '${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final path = 'uploads/$fileName';
 
-      // Pastikan nama bucket 'laundry_services' atau 'services' sesuai di dashboard Supabase Anda
-      await supabase.storage.from('laundry_services').upload(path, imageFile);
+    await supabase.storage
+        .from('laundry_services')
+        .upload(
+          path,
+          imageFile,
+          fileOptions: const FileOptions(
+            upsert: true,
+            contentType: 'image/jpeg',
+          ),
+        );
 
-      // Ambil URL publik
-      final String publicUrl = supabase.storage.from('laundry_services').getPublicUrl(path);
-      return publicUrl;
-    } catch (e) {
-      print("Upload Error: $e");
-      return null;
-    }
+    return supabase.storage
+        .from('laundry_services')
+        .getPublicUrl(path);
+  } catch (e) {
+    debugPrint('UPLOAD ERROR => $e');
+    return null;
   }
+}
+
 
   // Update Fungsi Create Data
-  Future<void> createData({
-    required String name,
-    required String subtitle,
-    required String price,
-    required String description,
-  }) async {
-    try {
-      isLoading(true);
-      String? finalUrl;
+ Future<void> createData({
+  required String name,
+  required String subtitle,
+  required String price,
+  required String description,
+}) async {
+  try {
+    isLoading.value = true;
 
-      // Jika ada gambar yang dipilih, upload dulu
-      if (imagePath.value.isNotEmpty) {
-        finalUrl = await uploadImage(File(imagePath.value));
+    String imageUrl = '';
+
+    // 🔹 Upload image jika ada
+    if (imagePath.value.isNotEmpty) {
+      final uploadedUrl = await uploadImage(File(imagePath.value));
+      if (uploadedUrl != null) {
+        imageUrl = uploadedUrl;
       }
-
-      await supabase.from('laundry_services').insert({
-        'name': name,
-        'subtitle': subtitle,
-        'image_url': finalUrl, // Gunakan URL dari storage
-        'price': price,
-        'description': description,
-      });
-
-      await fetchData();
-      imagePath.value = ''; // Reset path
-      Get.back();
-      Get.snackbar('Sukses', 'Data tersimpan');
-    } catch (e) {
-      Get.snackbar('Error', e.toString());
-    } finally {
-      isLoading(false);
     }
+
+    // 🔹 Insert ke database
+    await supabase.from('laundry_services').insert({
+      'name': name,
+      'subtitle': subtitle,
+      'image_url': imageUrl, // PASTI string (tidak null)
+      'price': price,
+      'description': description,
+    });
+
+    // 🔥 REFRESH DATA
+    await fetchData();
+
+    // 🔹 Reset state
+    imagePath.value = '';
+    Get.back();
+
+    Get.snackbar(
+      'Sukses',
+      'Data berhasil ditambahkan',
+      snackPosition: SnackPosition.BOTTOM,
+    );
+  } catch (e) {
+    Get.snackbar(
+      'Error',
+      e.toString(),
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
+  } finally {
+    isLoading.value = false;
   }
+}
 
 
   Future<void> updateData({

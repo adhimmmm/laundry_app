@@ -290,31 +290,49 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
                       border: Border.all(color: Colors.grey),
                     ),
                     child: controller.imagePath.value.isEmpty
-                        ? (item['image_url'] != null &&
-                                  item['image_url'].toString().startsWith(
-                                    'http',
-                                  )
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: Image.network(
-                                    item['image_url'],
-                                    fit: BoxFit.cover,
-                                  ),
-                                )
-                              : const Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Icons.camera_alt, size: 40),
-                                    Text("Klik untuk ganti gambar"),
-                                  ],
-                                ))
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.file(
-                              File(controller.imagePath.value),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+    ? (item['image_url'] != null &&
+            item['image_url'].toString().isNotEmpty)
+        ? ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(
+              item['image_url'],
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+              loadingBuilder: (context, child, progress) {
+                if (progress == null) return child;
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              },
+              errorBuilder: (context, error, stackTrace) {
+                return const Center(
+                  child: Icon(
+                    Icons.broken_image,
+                    size: 40,
+                    color: Colors.red,
+                  ),
+                );
+              },
+            ),
+          )
+        : const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.camera_alt, size: 40),
+              Text("Klik untuk ganti gambar"),
+            ],
+          )
+    : ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.file(
+          File(controller.imagePath.value),
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+        ),
+      ),
+
                   ),
                 ),
               ),

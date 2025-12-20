@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:loundry_app/app/modules/explore/controllers/explore_controller.dart';
+import 'package:loundry_app/app/modules/explore/views/explore_view.dart';
 import 'package:loundry_app/app/modules/home/controllers/home_controller.dart';
+import 'package:loundry_app/app/modules/order/views/order_view.dart';
 import 'package:loundry_app/app/modules/profile/controllers/profile_controller.dart';
 import 'package:loundry_app/app/modules/profile/views/profile_view.dart';
 import '../../home/views/home_view.dart';
@@ -28,12 +31,15 @@ class _MainViewState extends State<MainView> {
     if (!Get.isRegistered<HomeController>()) {
       Get.put(HomeController(), permanent: true);
     }
+    if (!Get.isRegistered<ExploreController>()) {
+      Get.put(ExploreController(), permanent: true);
+    }
   }
 
   final pages = const [
     HomeView(),
-    Center(child: Text('Explore')),
-    Center(child: Text('Orders')),
+    ExploreView(),
+    OrderView(),
     ProfileView(),
   ];
 

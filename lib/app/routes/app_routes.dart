@@ -12,6 +12,8 @@ abstract class Routes {
   static const NOTIFICATION = _Paths.NOTIFICATION;
   static const ADMIN_DASHBORAD = _Paths.ADMIN_DASHBORAD;
   static const POPULAR_SERVICES_DETAIL = _Paths.POPULAR_SERVICES_DETAIL;
+  static const EXPLORE = _Paths.EXPLORE;
+  static const ORDER = _Paths.ORDER;
 }
 
 abstract class _Paths {
@@ -25,4 +27,6 @@ abstract class _Paths {
   static const NOTIFICATION = '/notification';
   static const ADMIN_DASHBORAD = '/admin-dashborad';
   static const POPULAR_SERVICES_DETAIL = '/popular-services-detail';
+  static const EXPLORE = '/explore';
+  static const ORDER = '/order';
 }

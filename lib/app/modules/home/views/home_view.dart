@@ -18,14 +18,12 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     final HomeController homeC = Get.find<HomeController>();
-
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: CustomScrollView(
         slivers: [
-          /// ================= HEADER =================
           SliverAppBar(
             pinned: true,
             expandedHeight: 180,
@@ -50,7 +48,6 @@ class _HomeViewState extends State<HomeView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        /// TOP BAR
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -104,13 +101,6 @@ class _HomeViewState extends State<HomeView> {
                                   isDark: isDark,
                                 ),
                                 const SizedBox(width: 8),
-                                _buildHeaderIconButton(
-                                  icon: Icons.favorite_border_rounded,
-                                  hasNotification: true,
-                                  onTap: () {},
-                                  isDark: isDark,
-                                ),
-                                const SizedBox(width: 8),
                                 GestureDetector(
                                   onTap: () async {
                                     await ThemeService.switchTheme();
@@ -134,10 +124,7 @@ class _HomeViewState extends State<HomeView> {
                             ),
                           ],
                         ),
-
                         const Spacer(),
-
-                        /// SEARCH BAR
                         Container(
                           height: 52,
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -200,26 +187,28 @@ class _HomeViewState extends State<HomeView> {
               ),
             ),
           ),
-
-          /// ================= CONTENT =================
           SliverToBoxAdapter(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 20),
-
-                /// SPECIAL OFFERS WITH IMAGE
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _sectionTitle('Special Offers', isDark),
+                      Text(
+                        'Special Offers',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                      ),
                       const SizedBox(height: 12),
                     ],
                   ),
                 ),
-
                 SizedBox(
                   height: 160,
                   child: ListView(
@@ -252,10 +241,7 @@ class _HomeViewState extends State<HomeView> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 28),
-
-                /// SERVICES
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -364,18 +350,18 @@ class _HomeViewState extends State<HomeView> {
                               ),
                             ),
                             _ServiceItem(
-                              imagePath: 'assets/home/dice.png',
-                              label: 'Curtain',
+                              imagePath: 'assets/home/shoe.png',
+                              label: 'Shoe',
                               isDark: isDark,
                               onTap: () => Get.to(
                                 () => const DetailServiceView(),
                                 arguments: {
-                                  'name': 'Curtain Care',
-                                  'image': 'assets/home/dice.png',
+                                  'name': 'Shoe Care',
+                                  'image': 'assets/home/shoe.png',
                                   'price': 'Rp 12.000 / kg',
                                   'subtitle': 'Dust Free',
                                   'description':
-                                      'Cuci gorden tebal maupun tipis agar ruangan kembali segar dan bebas debu pemicu alergi.',
+                                      'Cuci sepatu tebal maupun tipis agar ruangan kembali segar dan bebas debu pemicu alergi.',
                                 },
                               ),
                             ),
@@ -385,10 +371,7 @@ class _HomeViewState extends State<HomeView> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 28),
-
-                /// POPULAR PROVIDERS
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -397,8 +380,8 @@ class _HomeViewState extends State<HomeView> {
                       _sectionTitle(
                         'Popular Services',
                         isDark,
-                        onSeeAll: () => {
-                          
+                        onSeeAll: () {
+                          Get.toNamed(Routes.EXPLORE);
                         },
                       ),
                       const SizedBox(height: 12),
@@ -408,11 +391,9 @@ class _HomeViewState extends State<HomeView> {
                             child: CircularProgressIndicator(),
                           );
                         }
-
                         if (homeC.popularServices.isEmpty) {
                           return const Text('No popular services');
                         }
-
                         return Column(
                           children: homeC.popularServices.map((service) {
                             return Padding(
@@ -422,13 +403,11 @@ class _HomeViewState extends State<HomeView> {
                                 onTap: () {
                                   Get.toNamed(
                                     Routes.POPULAR_SERVICES_DETAIL,
-                                    arguments:
-                                        service, // ✅ KIRIM DATA SERVICE YANG DIKLIK
+                                    arguments: service,
                                   );
                                 },
                                 child: _popularProvider(
-                                  name: service['name'],
-                                  price: service['price'],
+                                  service: service,
                                   isDark: isDark,
                                 ),
                               ),
@@ -436,7 +415,6 @@ class _HomeViewState extends State<HomeView> {
                           }).toList(),
                         );
                       }),
-
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -448,8 +426,6 @@ class _HomeViewState extends State<HomeView> {
       ),
     );
   }
-
-  /// ================= UI COMPONENTS =================
 
   Widget _buildHeaderIconButton({
     required IconData icon,
@@ -505,7 +481,6 @@ class _HomeViewState extends State<HomeView> {
             color: isDark ? Colors.white : Colors.black,
           ),
         ),
-
         if (showSeeAll)
           GestureDetector(
             onTap: onSeeAll,
@@ -545,7 +520,6 @@ class _HomeViewState extends State<HomeView> {
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
-            /// BACKGROUND IMAGE
             Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
@@ -560,8 +534,6 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
             ),
-
-            /// OVERLAY GRADIENT - Enhanced for better contrast
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -582,8 +554,6 @@ class _HomeViewState extends State<HomeView> {
                 ),
               ),
             ),
-
-            /// GLASSMORPHISM EFFECT (optional subtle overlay)
             if (isDark)
               Container(
                 decoration: BoxDecoration(
@@ -594,26 +564,15 @@ class _HomeViewState extends State<HomeView> {
                   ),
                 ),
               ),
-
-            /// CONTENT
             Padding(
               padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// BADGE with enhanced styling
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          const Color(0xFFFF9F43),
-                          const Color(0xFFFF6B35),
-                        ],
-                      ),
+                      gradient: LinearGradient(colors: [const Color(0xFFFF9F43), const Color(0xFFFF6B35)]),
                       borderRadius: BorderRadius.circular(8),
                       boxShadow: [
                         BoxShadow(
@@ -634,40 +593,22 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
                   const Spacer(),
-
-                  /// TITLE with shadow for better readability
                   Text(
                     title,
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      shadows: [
-                        Shadow(
-                          color: Colors.black.withOpacity(0.5),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      shadows: [Shadow(color: Colors.black.withOpacity(0.5), blurRadius: 4, offset: const Offset(0, 2))],
                     ),
                   ),
                   const SizedBox(height: 6),
-
-                  /// DISCOUNT with glow effect
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? Colors.white.withOpacity(0.15)
-                          : Colors.white.withOpacity(0.2),
+                      color: isDark ? Colors.white.withOpacity(0.15) : Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.3),
-                        width: 1.5,
-                      ),
+                      border: Border.all(color: Colors.white.withOpacity(0.3), width: 1.5),
                     ),
                     child: Text(
                       discount,
@@ -678,9 +619,7 @@ class _HomeViewState extends State<HomeView> {
                         letterSpacing: 1,
                         shadows: [
                           Shadow(
-                            color: isDark
-                                ? Colors.blue.withOpacity(0.5)
-                                : Colors.black.withOpacity(0.3),
+                            color: isDark ? Colors.blue.withOpacity(0.5) : Colors.black.withOpacity(0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -691,8 +630,6 @@ class _HomeViewState extends State<HomeView> {
                 ],
               ),
             ),
-
-            /// SHINE EFFECT (top right corner)
             Positioned(
               top: -20,
               right: -20,
@@ -702,10 +639,7 @@ class _HomeViewState extends State<HomeView> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
-                    colors: [
-                      Colors.white.withOpacity(isDark ? 0.15 : 0.25),
-                      Colors.transparent,
-                    ],
+                    colors: [Colors.white.withOpacity(isDark ? 0.15 : 0.25), Colors.transparent],
                   ),
                 ),
               ),
@@ -717,8 +651,7 @@ class _HomeViewState extends State<HomeView> {
   }
 
   Widget _popularProvider({
-    required String name,
-    required String price,
+    required Map<String, dynamic> service,
     required bool isDark,
   }) {
     return Container(
@@ -740,81 +673,69 @@ class _HomeViewState extends State<HomeView> {
       ),
       child: Row(
         children: [
-          /// AVATAR
           Container(
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.blue[900]!.withOpacity(0.3)
-                  : const Color(0xFF5B8DEF).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
+              image: service['image_url'] != null && service['image_url'].toString().isNotEmpty
+                  ? DecorationImage(
+                      image: NetworkImage(service['image_url']),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
+              color: isDark ? Colors.blue[900]!.withOpacity(0.3) : const Color(0xFF5B8DEF).withOpacity(0.1),
             ),
-            child: Icon(
-              Icons.local_laundry_service_rounded,
-              color: isDark ? Colors.blue[300] : const Color(0xFF5B8DEF),
-              size: 28,
-            ),
+            child: service['image_url'] == null || service['image_url'].toString().isEmpty
+                ? Icon(
+                    Icons.local_laundry_service_rounded,
+                    color: isDark ? Colors.blue[300] : const Color(0xFF5B8DEF),
+                    size: 28,
+                  )
+                : null,
           ),
           const SizedBox(width: 12),
-
-          /// INFO
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  name,
+                  service['name'] ?? 'Service Name',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
-                    color: isDark ? Colors.white : const Color(0xFF1A1D1F),
+                    color: isDark ? Colors.white : Colors.black87,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Text(
-                      "Price:",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? Colors.grey[400]
-                            : const Color.fromARGB(255, 32, 33, 35),
-                      ),
+                if (service['subtitle'] != null && service['subtitle'].toString().isNotEmpty)
+                  Text(
+                    service['subtitle'],
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? Colors.grey[400] : Colors.grey[700],
                     ),
-                    const SizedBox(width: 4),
-                    Text(
-                      price,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? Colors.grey[400]
-                            : const Color.fromARGB(255, 51, 54, 51),
-                      ),
-                    ),
-                  ],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                const SizedBox(height: 4),
+                Text(
+                  service['price'] ?? 'Rp 0',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.blue[300] : const Color(0xFF5B8DEF),
+                  ),
                 ),
               ],
             ),
           ),
-
-          /// ARROW
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.blue[900]!.withOpacity(0.3)
-                  : const Color(0xFF5B8DEF).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: isDark ? Colors.blue[300] : const Color(0xFF5B8DEF),
-              size: 16,
-            ),
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            size: 16,
+            color: isDark ? Colors.blue[300] : const Color(0xFF5B8DEF),
           ),
         ],
       ),
@@ -846,9 +767,7 @@ class _ServiceItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isDark
-                  ? Colors.blue[900]!.withOpacity(0.3)
-                  : Colors.blue[50],
+              color: isDark ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
               borderRadius: BorderRadius.circular(12),
             ),
             child: Image.asset(

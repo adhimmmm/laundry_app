@@ -3,21 +3,10 @@ import 'package:get/get.dart';
 class MainViewController extends GetxController {
   //TODO: Implement MainViewController
 
-  final count = 0.obs;
-  @override
-  void onInit() {
-    super.onInit();
+   var currentIndex = 0.obs;
+
+  void changeTab(int index) {
+    currentIndex.value = index;
   }
 
-  @override
-  void onReady() {
-    super.onReady();
-  }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
 }

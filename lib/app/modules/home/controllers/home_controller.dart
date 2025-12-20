@@ -14,20 +14,19 @@ class HomeController extends GetxController {
   }
 
   Future<void> fetchServices() async {
-    try {
-      isLoading(true);
-      // Mengambil data dari tabel laundry_services
-      final data = await supabase
-          .from('laundry_services')
-          .select()
-          .limit(5); // Ambil 5 data teratas sebagai "Popular"
-      
-      popularServices.assignAll(data);
-    } catch (e) {
-      print("Error fetching popular services: $e");
-    } finally {
-      isLoading(false);
-    }
+  try {
+    isLoading(true);
+    final data = await supabase
+        .from('laundry_services')
+        .select()
+        .order('created_at', ascending: false)
+        .limit(5);
+    popularServices.assignAll(data);
+  } catch (e) {
+    print("Error fetching popular services: $e");
+  } finally {
+    isLoading(false);
   }
+}
 
 }

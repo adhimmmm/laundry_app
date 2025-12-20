@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
-
-import '../modules/admin_dashborad/bindings/admin_dashborad_binding.dart';
-import '../modules/admin_dashborad/views/admin_dashborad_view.dart';
+import 'package:loundry_app/app/modules/admin_dashboard/bindings/admin_dashboard_binding.dart';
+import 'package:loundry_app/app/modules/admin_dashboard/views/admin_dashboard_view.dart';
 import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/auth_view.dart';
 import '../modules/home/bindings/home_binding.dart';

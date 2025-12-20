@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/admin_dashborad_controller.dart';
+import '../controllers/admin_dashboard_controller.dart';
 
 class AdminDashboradView extends GetView<AdminDashboradController> {
   const AdminDashboradView({super.key});

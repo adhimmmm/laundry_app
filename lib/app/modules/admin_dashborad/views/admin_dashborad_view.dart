@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/admin_dashborad_controller.dart';
@@ -37,8 +39,8 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
                     leading: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: Image.network(
-                        item['image_url'] ??
-                            '', // Ambil field image_url dari database
+                        item['image_url'] ?? '',
+                        key: ValueKey(item['image_url']),
                         width: 50,
                         height: 50,
                         fit: BoxFit.cover,
@@ -121,9 +123,11 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
   void showCreateForm(BuildContext context) {
     final nameController = TextEditingController();
     final subController = TextEditingController();
-    final imgController = TextEditingController();
     final priceController = TextEditingController();
     final descController = TextEditingController();
+
+    // Reset imagePath saat buka form
+    controller.imagePath.value = '';
 
     Get.bottomSheet(
       Container(
@@ -134,16 +138,47 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
         ),
         child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
                 "Tambah Service Baru",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 15),
+
+              // --- UI PILIH GAMBAR ---
+              Obx(
+                () => GestureDetector(
+                  onTap: () => controller.pickImage(),
+                  child: Container(
+                    width: double.infinity,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: controller.imagePath.value.isEmpty
+                        ? const Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.camera_alt, size: 40),
+                              Text("Klik untuk upload gambar"),
+                            ],
+                          )
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.file(
+                              File(controller.imagePath.value),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 15),
               _buildTextField(nameController, "Nama Service", Icons.label),
               _buildTextField(subController, "Subtitle", Icons.subtitles),
-              _buildTextField(imgController, "Image URL", Icons.image),
               _buildTextField(
                 priceController,
                 "Price",
@@ -156,33 +191,38 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
                 Icons.description,
                 maxLines: 3,
               ),
+
               const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                  onPressed: () {
-                    controller.createData(
-                      name: nameController.text,
-                      subtitle: subController.text,
-                      imageUrl: imgController.text,
-                      price: priceController.text,
-                      description: descController.text,
-                    );
-                  },
-                  child: const Text(
-                    "Simpan Data",
-                    style: TextStyle(color: Colors.white),
+              Obx(
+                () => SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                    ),
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : () => controller.createData(
+                            name: nameController.text,
+                            subtitle: subController.text,
+                            price: priceController.text,
+                            description: descController.text,
+                          ),
+                    child: controller.isLoading.value
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            "Simpan Data",
+                            style: TextStyle(color: Colors.white),
+                          ),
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
             ],
           ),
         ),
       ),
-      isScrollControlled: true, // Agar form tidak tertutup keyboard
+      isScrollControlled: true,
     );
   }
 
@@ -210,58 +250,126 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
   }
 
   void showEditForm(BuildContext context, Map<String, dynamic> item) {
-  // Isi controller langsung dengan data yang sudah ada (item)
-  final nameController = TextEditingController(text: item['name']);
-  final subController = TextEditingController(text: item['subtitle']);
-  final imgController = TextEditingController(text: item['image_url']);
-  final priceController = TextEditingController(text: item['price'].toString());
-  final descController = TextEditingController(text: item['description']);
+    // Isi controller langsung dengan data yang sudah ada
+    final nameController = TextEditingController(text: item['name']);
+    final subController = TextEditingController(text: item['subtitle']);
+    final priceController = TextEditingController(
+      text: item['price'].toString(),
+    );
+    final descController = TextEditingController(text: item['description']);
 
-  Get.bottomSheet(
-    Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("Edit Service", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 15),
-            _buildTextField(nameController, "Nama Service", Icons.label),
-            _buildTextField(subController, "Subtitle", Icons.subtitles),
-            _buildTextField(imgController, "Image URL", Icons.image),
-            _buildTextField(priceController, "Price", Icons.money, isNumber: true),
-            _buildTextField(descController, "Description", Icons.description, maxLines: 3),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-                onPressed: () {
-                  controller.updateData(
-                    id: item['id'].toString(), // Kirim ID untuk pencocokan database
-                    name: nameController.text,
-                    subtitle: subController.text,
-                    imageUrl: imgController.text,
-                    price: priceController.text,
-                    description: descController.text,
-                  );
-                },
-                child: const Text("Perbarui Data", style: TextStyle(color: Colors.white)),
+    // Reset imagePath saat buka form agar tidak nyangkut dari editan sebelumnya
+    controller.imagePath.value = '';
+
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const Text(
+                "Edit Service",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(height: 10),
-          ],
+              const SizedBox(height: 15),
+
+              // --- UI PILIH GAMBAR (SAMA DENGAN CREATE) ---
+              Obx(
+                () => GestureDetector(
+                  onTap: () => controller.pickImage(),
+                  child: Container(
+                    width: double.infinity,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.grey),
+                    ),
+                    child: controller.imagePath.value.isEmpty
+                        ? (item['image_url'] != null &&
+                                  item['image_url'].toString().startsWith(
+                                    'http',
+                                  )
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.network(
+                                    item['image_url'],
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.camera_alt, size: 40),
+                                    Text("Klik untuk ganti gambar"),
+                                  ],
+                                ))
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.file(
+                              File(controller.imagePath.value),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 15),
+              _buildTextField(nameController, "Nama Service", Icons.label),
+              _buildTextField(subController, "Subtitle", Icons.subtitles),
+              _buildTextField(
+                priceController,
+                "Price",
+                Icons.money,
+                isNumber: true,
+              ),
+              _buildTextField(
+                descController,
+                "Description",
+                Icons.description,
+                maxLines: 3,
+              ),
+
+              const SizedBox(height: 20),
+
+              // --- TOMBOL UPDATE ---
+              Obx(
+                () => SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                    ), // Warna orange untuk Edit
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : () => controller.updateData(
+                            id: item['id'].toString(),
+                            name: nameController.text,
+                            subtitle: subController.text,
+                            price: priceController.text,
+                            description: descController.text,
+                            oldImageUrl: item['image_url'],
+                          ),
+                    child: controller.isLoading.value
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            "Perbarui Data",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-    isScrollControlled: true,
-  );
+      isScrollControlled: true,
+    );
+  }
 }
-}
-
-

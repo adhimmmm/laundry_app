@@ -36,9 +36,9 @@ class AuthController extends GetxController {
       Get.offAllNamed(Routes.MAIN_VIEW);
     } catch (e) {
       Get.snackbar(
-        'Login Failed',
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
+        'Error',
+        'Email dan password salah',
+        snackPosition: SnackPosition.TOP,
       );
     } finally {
       isLoading.value = false;

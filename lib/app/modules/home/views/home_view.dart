@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:loundry_app/app/core/services/detail_services.dart';
 import 'package:loundry_app/app/modules/laundry_map/bindings/laundry_map_binding.dart';
 import 'package:loundry_app/app/modules/laundry_map/views/laundry_map_view.dart';
 import 'package:loundry_app/app/routes/app_pages.dart';
@@ -292,35 +293,102 @@ class _HomeViewState extends State<HomeView> {
                         ),
 
                         child: GridView.count(
-                          crossAxisCount: 3, // 3 ke kanan
-                          mainAxisSpacing: 12, // 👈 lebih rapat
-                          crossAxisSpacing: 12, // 👈 lebih rapat
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 12,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          children: const [
+                          children: [
                             _ServiceItem(
                               imagePath: 'assets/home/washing-machine.png',
                               label: 'Washing',
+                              onTap: () => Get.to(
+                                () => const DetailServiceView(),
+                                arguments: {
+                                  'name': 'Washing Service',
+                                  'image': 'assets/home/washing-machine.png',
+                                  'price': 'Rp 10.000 / kg',
+                                  'subtitle': 'Clean & Fresh',
+                                  'description':
+                                      'Layanan cuci menggunakan mesin otomatis modern dengan deterjen cair premium yang menjaga serat kain tetap awet.',
+                                },
+                              ),
                             ),
                             _ServiceItem(
                               imagePath: 'assets/home/iron.png',
                               label: 'Ironing',
+                              onTap: () => Get.to(
+                                () => const DetailServiceView(),
+                                arguments: {
+                                  'name': 'Ironing Only',
+                                  'image': 'assets/home/iron.png',
+                                  'price': 'Rp 7.000 / kg',
+                                  'subtitle': 'Smooth & Neat',
+                                  'description':
+                                      'Penyetrikaan rapi menggunakan setrika uap untuk memastikan semua lipatan hilang tanpa merusak bahan pakaian.',
+                                },
+                              ),
                             ),
                             _ServiceItem(
                               imagePath: 'assets/home/dry-cleaning.png',
                               label: 'Dry Clean',
+                              onTap: () => Get.to(
+                                () => const DetailServiceView(),
+                                arguments: {
+                                  'name': 'Dry Cleaning',
+                                  'image': 'assets/home/dry-cleaning.png',
+                                  'price': 'Rp 25.000 / pcs',
+                                  'subtitle': 'Special Treatment',
+                                  'description':
+                                      'Pencucian khusus untuk jas, kebaya, atau bahan sensitif lainnya tanpa menggunakan air (solvent based).',
+                                },
+                              ),
                             ),
                             _ServiceItem(
                               imagePath: 'assets/home/power-washing.png',
                               label: 'Carpet',
+                              onTap: () => Get.to(
+                                () => const DetailServiceView(),
+                                arguments: {
+                                  'name': 'Carpet Cleaning',
+                                  'image': 'assets/home/power-washing.png',
+                                  'price': 'Rp 15.000 / m2',
+                                  'subtitle': 'Deep Clean',
+                                  'description':
+                                      'Pembersihan karpet menyeluruh hingga ke sela-sela benang untuk menghilangkan debu dan tungau.',
+                                },
+                              ),
                             ),
                             _ServiceItem(
                               imagePath: 'assets/home/sofa.png',
                               label: 'Sofa',
+                              onTap: () => Get.to(
+                                () => const DetailServiceView(),
+                                arguments: {
+                                  'name': 'Sofa Cleaning',
+                                  'image': 'assets/home/sofa.png',
+                                  'price': 'Rp 50.000 / seat',
+                                  'subtitle': 'Hygienic Sofa',
+                                  'description':
+                                      'Cuci sofa di tempat menggunakan alat vakum khusus untuk hasil bersih dan kering dengan cepat.',
+                                },
+                              ),
                             ),
                             _ServiceItem(
-                              imagePath: 'assets/home/dice.png',
+                              imagePath:
+                                  'assets/home/dice.png', // Ganti jika ada icon curtain
                               label: 'Curtain',
+                              onTap: () => Get.to(
+                                () => const DetailServiceView(),
+                                arguments: {
+                                  'name': 'Curtain Care',
+                                  'image': 'assets/home/dice.png',
+                                  'price': 'Rp 12.000 / kg',
+                                  'subtitle': 'Dust Free',
+                                  'description':
+                                      'Cuci gorden tebal maupun tipis agar ruangan kembali segar dan bebas debu pemicu alergi.',
+                                },
+                              ),
                             ),
                           ],
                         ),
@@ -337,21 +405,18 @@ class _HomeViewState extends State<HomeView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _sectionTitle('Popular Providers'),
+                      _sectionTitle('Popular Services'),
                       const SizedBox(height: 12),
-                      _popularProvider(
-                        name: 'Spotless Attire',
-                        reviews: '1.8k',
-                      ),
+                      _popularProvider(name: 'Spotless Attire', price: '1.8k'),
                       const SizedBox(height: 12),
                       _popularProvider(
                         name: 'Fresh & Clean Laundry',
-                        reviews: '1.8k',
+                        price: '1.8k',
                       ),
                       const SizedBox(height: 12),
                       _popularProvider(
                         name: 'Perfect Press Service',
-                        reviews: '1.2k',
+                        price: '1.2k',
                       ),
                       const SizedBox(height: 20),
                     ],
@@ -496,10 +561,7 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _popularProvider({
-    required String name,
-    required String reviews,
-  }) {
+  Widget _popularProvider({required String name, required String price}) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -546,12 +608,12 @@ class _HomeViewState extends State<HomeView> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: Color.fromARGB(255, 32, 33, 35)
+                        color: Color.fromARGB(255, 32, 33, 35),
                       ),
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      reviews,
+                      price,
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
@@ -585,44 +647,50 @@ class _HomeViewState extends State<HomeView> {
 }
 
 class _ServiceItem extends StatelessWidget {
-  final String imagePath; // Mengubah IconData menjadi String path
+  final String imagePath;
   final String label;
+  final VoidCallback onTap; // Tambahkan parameter onTap
 
-  const _ServiceItem({required this.imagePath, required this.label});
+  const _ServiceItem({
+    required this.imagePath,
+    required this.label,
+    required this.onTap, // Wajib diisi
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 56,
-          height: 56,
-          padding: const EdgeInsets.all(
-            12,
-          ), // Memberi ruang agar gambar tidak menempel ke pinggir
-          decoration: BoxDecoration(
-            color: const Color(0xFF5B8DEF).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(14),
+    return InkWell(
+      onTap: onTap, // Menjalankan fungsi saat diklik
+      borderRadius: BorderRadius.circular(12),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.blue[50],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Image.asset(
+              imagePath,
+              width: 40,
+              height: 40,
+              // Jika gambar tidak ada, tampilkan icon default agar tidak merah (error)
+              errorBuilder: (context, error, stackTrace) =>
+                  const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+            ),
           ),
-          child: Image.asset(
-            imagePath,
-            fit: BoxFit
-                .contain, // Agar gambar menyesuaikan ukuran container dengan rapi
-            // color: const Color(0xFF5B8DEF), // Opsional: gunakan ini jika gambar kamu adalah icon PNG transparan yang ingin diwarnai biru
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+            ),
           ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF6C757D),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

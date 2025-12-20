@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
-import 'package:loundry_app/app/modules/admin_dashboard/bindings/admin_dashboard_binding.dart';
-import 'package:loundry_app/app/modules/admin_dashboard/views/admin_dashboard_view.dart';
+
+import '../modules/admin_dashboard/bindings/admin_dashboard_binding.dart';
+import '../modules/admin_dashboard/views/admin_dashboard_view.dart';
 import '../modules/auth/bindings/auth_binding.dart';
 import '../modules/auth/views/auth_view.dart';
 import '../modules/home/bindings/home_binding.dart';
@@ -13,6 +14,8 @@ import '../modules/notification/bindings/notification_binding.dart';
 import '../modules/notification/views/notification_view.dart';
 import '../modules/onboarding/bindings/onboarding_binding.dart';
 import '../modules/onboarding/views/onboarding_view.dart';
+import '../modules/popular_services_detail/bindings/popular_services_detail_binding.dart';
+import '../modules/popular_services_detail/views/popular_services_detail_view.dart';
 import '../modules/profile/bindings/profile_binding.dart';
 import '../modules/profile/views/profile_view.dart';
 
@@ -61,6 +64,11 @@ class AppPages {
       name: _Paths.ADMIN_DASHBORAD,
       page: () => const AdminDashboradView(),
       binding: AdminDashboradBinding(),
+    ),
+    GetPage(
+      name: _Paths.POPULAR_SERVICES_DETAIL,
+      page: () => const PopularServicesDetailView(),
+      binding: PopularServicesDetailBinding(),
     ),
   ];
 }

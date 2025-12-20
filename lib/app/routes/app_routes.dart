@@ -11,6 +11,7 @@ abstract class Routes {
   static const LAUNDRY_MAP = _Paths.LAUNDRY_MAP;
   static const NOTIFICATION = _Paths.NOTIFICATION;
   static const ADMIN_DASHBORAD = _Paths.ADMIN_DASHBORAD;
+  static const POPULAR_SERVICES_DETAIL = _Paths.POPULAR_SERVICES_DETAIL;
 }
 
 abstract class _Paths {
@@ -23,4 +24,5 @@ abstract class _Paths {
   static const LAUNDRY_MAP = '/laundry-map';
   static const NOTIFICATION = '/notification';
   static const ADMIN_DASHBORAD = '/admin-dashborad';
+  static const POPULAR_SERVICES_DETAIL = '/popular-services-detail';
 }

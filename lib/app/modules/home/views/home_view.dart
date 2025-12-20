@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loundry_app/app/core/services/detail_services.dart';
+import 'package:loundry_app/app/modules/home/controllers/home_controller.dart';
 import 'package:loundry_app/app/modules/laundry_map/bindings/laundry_map_binding.dart';
 import 'package:loundry_app/app/modules/laundry_map/views/laundry_map_view.dart';
 import 'package:loundry_app/app/routes/app_pages.dart';
@@ -16,8 +17,10 @@ class HomeView extends StatefulWidget {
 class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
+    final HomeController homeC = Get.find<HomeController>();
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       body: CustomScrollView(
@@ -26,7 +29,9 @@ class _HomeViewState extends State<HomeView> {
           SliverAppBar(
             pinned: true,
             expandedHeight: 180,
-            backgroundColor: isDark ? Colors.grey[900] : Theme.of(context).scaffoldBackgroundColor,
+            backgroundColor: isDark
+                ? Colors.grey[900]
+                : Theme.of(context).scaffoldBackgroundColor,
             elevation: 0,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
@@ -34,9 +39,9 @@ class _HomeViewState extends State<HomeView> {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: isDark 
-                      ? [const Color(0xFF1E3A8A), const Color(0xFF3B82F6)]
-                      : [const Color(0xFF5B8DEF), const Color(0xFF4A7FE8)],
+                    colors: isDark
+                        ? [const Color(0xFF1E3A8A), const Color(0xFF3B82F6)]
+                        : [const Color(0xFF5B8DEF), const Color(0xFF4A7FE8)],
                   ),
                 ),
                 child: SafeArea(
@@ -141,7 +146,9 @@ class _HomeViewState extends State<HomeView> {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(isDark ? 0.3 : 0.06),
+                                color: Colors.black.withOpacity(
+                                  isDark ? 0.3 : 0.06,
+                                ),
                                 blurRadius: 16,
                                 offset: const Offset(0, 4),
                               ),
@@ -151,19 +158,25 @@ class _HomeViewState extends State<HomeView> {
                             children: [
                               Icon(
                                 Icons.search_rounded,
-                                color: isDark ? Colors.blue[300] : const Color(0xFF5B8DEF),
+                                color: isDark
+                                    ? Colors.blue[300]
+                                    : const Color(0xFF5B8DEF),
                                 size: 22,
                               ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: TextField(
                                   style: TextStyle(
-                                    color: isDark ? Colors.white : Colors.black87,
+                                    color: isDark
+                                        ? Colors.white
+                                        : Colors.black87,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: 'Search service, provider...',
                                     hintStyle: TextStyle(
-                                      color: isDark ? Colors.grey[500] : const Color(0xFFADB5BD),
+                                      color: isDark
+                                          ? Colors.grey[500]
+                                          : const Color(0xFFADB5BD),
                                       fontSize: 14,
                                     ),
                                     border: InputBorder.none,
@@ -172,7 +185,9 @@ class _HomeViewState extends State<HomeView> {
                               ),
                               Icon(
                                 Icons.tune_rounded,
-                                color: isDark ? Colors.blue[300] : const Color(0xFF5B8DEF),
+                                color: isDark
+                                    ? Colors.blue[300]
+                                    : const Color(0xFF5B8DEF),
                                 size: 22,
                               ),
                             ],
@@ -253,7 +268,9 @@ class _HomeViewState extends State<HomeView> {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(isDark ? 0.3 : 0.04),
+                              color: Colors.black.withOpacity(
+                                isDark ? 0.3 : 0.04,
+                              ),
                               blurRadius: 12,
                               offset: const Offset(0, 4),
                             ),
@@ -377,25 +394,49 @@ class _HomeViewState extends State<HomeView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _sectionTitle('Popular Services', isDark),
-                      const SizedBox(height: 12),
-                      _popularProvider(
-                        name: 'Spotless Attire',
-                        price: '1.8k',
-                        isDark: isDark,
+                      _sectionTitle(
+                        'Popular Services',
+                        isDark,
+                        onSeeAll: () => {
+                          
+                        },
                       ),
                       const SizedBox(height: 12),
-                      _popularProvider(
-                        name: 'Fresh & Clean Laundry',
-                        price: '1.8k',
-                        isDark: isDark,
-                      ),
-                      const SizedBox(height: 12),
-                      _popularProvider(
-                        name: 'Perfect Press Service',
-                        price: '1.2k',
-                        isDark: isDark,
-                      ),
+                      Obx(() {
+                        if (homeC.isLoading.value) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+
+                        if (homeC.popularServices.isEmpty) {
+                          return const Text('No popular services');
+                        }
+
+                        return Column(
+                          children: homeC.popularServices.map((service) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: () {
+                                  Get.toNamed(
+                                    Routes.POPULAR_SERVICES_DETAIL,
+                                    arguments:
+                                        service, // ✅ KIRIM DATA SERVICE YANG DIKLIK
+                                  );
+                                },
+                                child: _popularProvider(
+                                  name: service['name'],
+                                  price: service['price'],
+                                  isDark: isDark,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      }),
+
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -427,11 +468,7 @@ class _HomeViewState extends State<HomeView> {
               color: Colors.white.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 22,
-            ),
+            child: Icon(icon, color: Colors.white, size: 22),
           ),
           if (hasNotification)
             Positioned(
@@ -451,7 +488,12 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _sectionTitle(String title, bool isDark) {
+  Widget _sectionTitle(
+    String title,
+    bool isDark, {
+    VoidCallback? onSeeAll,
+    bool showSeeAll = true,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -460,25 +502,21 @@ class _HomeViewState extends State<HomeView> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : const Color(0xFF1A1D1F),
+            color: isDark ? Colors.white : Colors.black,
           ),
         ),
-        TextButton(
-          onPressed: () {},
-          style: TextButton.styleFrom(
-            padding: EdgeInsets.zero,
-            minimumSize: const Size(50, 30),
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-          child: Text(
-            'See all',
-            style: TextStyle(
-              color: isDark ? Colors.blue[300] : const Color(0xFF5B8DEF),
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
+
+        if (showSeeAll)
+          GestureDetector(
+            onTap: onSeeAll,
+            child: Text(
+              'See All',
+              style: TextStyle(
+                color: const Color(0xFF5B8DEF),
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -513,12 +551,12 @@ class _HomeViewState extends State<HomeView> {
                 image: DecorationImage(
                   image: AssetImage(image),
                   fit: BoxFit.cover,
-                  colorFilter: isDark 
-                    ? ColorFilter.mode(
-                        Colors.black.withOpacity(0.2),
-                        BlendMode.darken,
-                      )
-                    : null,
+                  colorFilter: isDark
+                      ? ColorFilter.mode(
+                          Colors.black.withOpacity(0.2),
+                          BlendMode.darken,
+                        )
+                      : null,
                 ),
               ),
             ),
@@ -530,16 +568,16 @@ class _HomeViewState extends State<HomeView> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: isDark
-                    ? [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.4),
-                        Colors.black.withOpacity(0.85),
-                      ]
-                    : [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.2),
-                        Colors.black.withOpacity(0.75),
-                      ],
+                      ? [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.4),
+                          Colors.black.withOpacity(0.85),
+                        ]
+                      : [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.2),
+                          Colors.black.withOpacity(0.75),
+                        ],
                   stops: const [0.0, 0.5, 1.0],
                 ),
               ),
@@ -552,10 +590,7 @@ class _HomeViewState extends State<HomeView> {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Colors.blue.withOpacity(0.1),
-                      Colors.transparent,
-                    ],
+                    colors: [Colors.blue.withOpacity(0.1), Colors.transparent],
                   ),
                 ),
               ),
@@ -599,7 +634,7 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
                   const Spacer(),
-                  
+
                   /// TITLE with shadow for better readability
                   Text(
                     title,
@@ -617,7 +652,7 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  
+
                   /// DISCOUNT with glow effect
                   Container(
                     padding: const EdgeInsets.symmetric(
@@ -625,9 +660,9 @@ class _HomeViewState extends State<HomeView> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: isDark 
-                        ? Colors.white.withOpacity(0.15)
-                        : Colors.white.withOpacity(0.2),
+                      color: isDark
+                          ? Colors.white.withOpacity(0.15)
+                          : Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: Colors.white.withOpacity(0.3),
@@ -643,9 +678,9 @@ class _HomeViewState extends State<HomeView> {
                         letterSpacing: 1,
                         shadows: [
                           Shadow(
-                            color: isDark 
-                              ? Colors.blue.withOpacity(0.5)
-                              : Colors.black.withOpacity(0.3),
+                            color: isDark
+                                ? Colors.blue.withOpacity(0.5)
+                                : Colors.black.withOpacity(0.3),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -710,9 +745,9 @@ class _HomeViewState extends State<HomeView> {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: isDark 
-                ? Colors.blue[900]!.withOpacity(0.3)
-                : const Color(0xFF5B8DEF).withOpacity(0.1),
+              color: isDark
+                  ? Colors.blue[900]!.withOpacity(0.3)
+                  : const Color(0xFF5B8DEF).withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -744,7 +779,9 @@ class _HomeViewState extends State<HomeView> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
-                        color: isDark ? Colors.grey[400] : const Color.fromARGB(255, 32, 33, 35),
+                        color: isDark
+                            ? Colors.grey[400]
+                            : const Color.fromARGB(255, 32, 33, 35),
                       ),
                     ),
                     const SizedBox(width: 4),
@@ -753,7 +790,9 @@ class _HomeViewState extends State<HomeView> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
-                        color: isDark ? Colors.grey[400] : const Color.fromARGB(255, 51, 54, 51),
+                        color: isDark
+                            ? Colors.grey[400]
+                            : const Color.fromARGB(255, 51, 54, 51),
                       ),
                     ),
                   ],
@@ -766,9 +805,9 @@ class _HomeViewState extends State<HomeView> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: isDark 
-                ? Colors.blue[900]!.withOpacity(0.3)
-                : const Color(0xFF5B8DEF).withOpacity(0.1),
+              color: isDark
+                  ? Colors.blue[900]!.withOpacity(0.3)
+                  : const Color(0xFF5B8DEF).withOpacity(0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
@@ -807,9 +846,9 @@ class _ServiceItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isDark 
-                ? Colors.blue[900]!.withOpacity(0.3)
-                : Colors.blue[50],
+              color: isDark
+                  ? Colors.blue[900]!.withOpacity(0.3)
+                  : Colors.blue[50],
               borderRadius: BorderRadius.circular(12),
             ),
             child: Image.asset(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:loundry_app/app/modules/home/controllers/home_controller.dart';
 import 'package:loundry_app/app/modules/profile/controllers/profile_controller.dart';
 import 'package:loundry_app/app/modules/profile/views/profile_view.dart';
 import '../../home/views/home_view.dart';
@@ -19,9 +20,13 @@ class _MainViewState extends State<MainView> {
   void initState() {
     super.initState();
 
-    /// ✅ REGISTER CONTROLLER SEKALI
+
     if (!Get.isRegistered<ProfileController>()) {
       Get.put(ProfileController(), permanent: true);
+    }
+
+    if (!Get.isRegistered<HomeController>()) {
+      Get.put(HomeController(), permanent: true);
     }
   }
 

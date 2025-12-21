@@ -39,7 +39,7 @@ class _MainViewState extends State<MainView> {
   final pages = const [
     HomeView(),
     ExploreView(),
-    OrderView(),
+    // OrderView(),
     ProfileView(),
   ];
 

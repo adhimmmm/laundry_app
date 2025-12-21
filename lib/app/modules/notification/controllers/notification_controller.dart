@@ -5,17 +5,28 @@ import '../../../core/services/notification_hive_service.dart';
 
 class NotificationController extends GetxController {
   final NotificationHiveService _hive = Get.find();
-
   final notifications = <NotificationModel>[].obs;
+
+  bool get hasUnread => notifications.any((n) => !n.isRead);
 
   @override
   void onInit() {
-    loadNotifications();
     super.onInit();
+    loadNotifications();
   }
 
   void loadNotifications() {
     notifications.assignAll(_hive.getAll());
+    notifications.refresh();
+  }
+
+  void markAllAsRead() {
+    for (var notif in notifications) {
+      if (!notif.isRead) {
+        _hive.markAsRead(notif);
+      }
+    }
+    loadNotifications();
   }
 
   void markRead(NotificationModel notif) {
@@ -33,7 +44,6 @@ class NotificationController extends GetxController {
     loadNotifications();
   }
 
-  /// ================= GROUP BY DATE =================
   Map<String, List<NotificationModel>> get groupedByDate {
     final Map<String, List<NotificationModel>> map = {};
     final formatter = DateFormat('EEEE, dd MMM yyyy');
@@ -45,6 +55,5 @@ class NotificationController extends GetxController {
     return map;
   }
 
-  int get unreadCount =>
-      notifications.where((e) => !e.isRead).length;
+  int get unreadCount => notifications.where((e) => !e.isRead).length;
 }

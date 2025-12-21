@@ -43,13 +43,13 @@ class AppBottomNav extends StatelessWidget {
                 icon: Icons.explore_rounded,
                 label: 'Explore',
               ),
+              // _buildNavItem(
+              //   index: 2,
+              //   icon: Icons.receipt_long_rounded,
+              //   label: 'Orders',
+              // ),
               _buildNavItem(
                 index: 2,
-                icon: Icons.receipt_long_rounded,
-                label: 'Orders',
-              ),
-              _buildNavItem(
-                index: 3,
                 icon: Icons.person_rounded,
                 label: 'Profile',
               ),

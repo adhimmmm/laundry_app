@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/popular_services_detail_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PopularServicesDetailView
     extends GetView<PopularServicesDetailController> {
@@ -217,16 +218,47 @@ class PopularServicesDetailView
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
-              onPressed: () {
-                Get.snackbar(
-                  'Success',
-                  'Booking feature coming soon',
-                  snackPosition: SnackPosition.BOTTOM,
-                  backgroundColor: Colors.green,
-                  colorText: Colors.white,
-                  margin: const EdgeInsets.all(16),
-                );
-              },
+              onPressed: () async {
+  // 1. Konfigurasi Nomor & Pesan
+  const String phoneNumber = "6289526261164"; 
+  final String message = 
+      "Halo Admin, saya ingin memesan layanan populer berikut:\n\n"
+      "*Nama Layanan:* ${service['name']}\n"
+      "*Kategori:* ${service['category']}\n"
+      "*Harga:* Rp ${service['price']}\n"
+      "*Keterangan:* ${service['subtitle']}";
+
+  // 2. Buat Uri object
+  final Uri whatsappUri = Uri.parse(
+    "https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message)}"
+  );
+
+  // 3. Eksekusi
+  try {
+    // Mengecek apakah link bisa dibuka (memastikan ada browser/wa)
+    if (await launchUrl(whatsappUri, mode: LaunchMode.externalApplication)) {
+       // Opsional: Beri feedback sukses
+       Get.snackbar(
+        'Processing', 
+        'Membuka WhatsApp...',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.blue,
+        colorText: Colors.white,
+      );
+    } else {
+      throw 'Could not launch $whatsappUri';
+    }
+  } catch (e) {
+    // Jika gagal (misal WA tidak terinstall)
+    Get.snackbar(
+      'Error',
+      'Tidak dapat membuka WhatsApp. Pastikan aplikasi terinstal.',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.redAccent,
+      colorText: Colors.white,
+    );
+  }
+},
               child: const Text(
                 'Book Now',
                 style: TextStyle(

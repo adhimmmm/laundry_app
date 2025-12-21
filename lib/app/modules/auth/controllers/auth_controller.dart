@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/services/supabase_service.dart';
@@ -17,9 +18,7 @@ class AuthController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    /// AUTO LOGIN CHECK diletakkan di onReady agar UI sudah siap
     if (user.value != null) {
-      // Pastikan kita tidak melakukan navigasi berulang jika sudah di MAIN_VIEW
       if (Get.currentRoute != Routes.MAIN_VIEW) {
         Get.offAllNamed(Routes.MAIN_VIEW);
       }
@@ -27,42 +26,77 @@ class AuthController extends GetxController {
   }
 
   Future<void> login(String email, String password) async {
+    if (email.isEmpty || password.isEmpty) {
+      Get.snackbar(
+        'Login Failed',
+        'Email and password cannot be empty',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
     try {
       isLoading.value = true;
-
       await _supabase.signIn(email, password);
       user.value = _supabase.currentUser;
-
       Get.offAllNamed(Routes.MAIN_VIEW);
     } catch (e) {
       Get.snackbar(
         'Error',
-        'Email dan password salah',
+        'Incorrect email or password',
         snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     } finally {
       isLoading.value = false;
     }
   }
 
-  Future<void> register(String email, String password) async {
+  Future<void> register(String email, String password, String name) async {
+    if (email.isEmpty || password.isEmpty || name.isEmpty) {
+      Get.snackbar(
+        'Registration Failed',
+        'All fields must be filled',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    if (password.length < 6) {
+      Get.snackbar(
+        'Warning',
+        'Password must be at least 6 characters',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.amber,
+        colorText: Colors.black,
+      );
+      return;
+    }
+
     try {
       isLoading.value = true;
-
       await _supabase.signUp(email, password);
-
+      
       Get.snackbar(
         'Success',
         'Account created, please login',
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
       );
-
-      Get.back(); // balik ke login
+      Get.back();
     } catch (e) {
       Get.snackbar(
         'Register Failed',
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
+        'Could not create account. Please try again.',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
       );
     } finally {
       isLoading.value = false;

@@ -13,9 +13,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app/routes/app_pages.dart';
 import 'app/core/services/theme_service.dart';
 import 'app/core/models/notification_handler.dart'; 
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(); // Inisialisasi Firebase
+
+  // Minta izin notifikasi (Penting untuk Android 13+)
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+  await messaging.requestPermission();
 
   await Hive.initFlutter();
   Hive.registerAdapter(NotificationModelAdapter());
@@ -25,7 +32,7 @@ void main() async {
 
   Get.put(notifHive);
 
-  // 🔥 Init GetStorage
+  // 🔥 Init GetStorageP
   await GetStorage.init();
 
   // 🔥 Load theme

@@ -116,6 +116,7 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
 
     Get.bottomSheet(
       _formContainer(
+        context,
         title: "Tambah Service Baru",
         nameController: nameController,
         subController: subController,
@@ -146,6 +147,7 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
 
     Get.bottomSheet(
       _formContainer(
+        context,
         title: "Edit Service",
         nameController: nameController,
         subController: subController,
@@ -167,7 +169,8 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
     );
   }
 
-  Widget _formContainer({
+  Widget _formContainer(
+    BuildContext context, {
     required String title,
     required TextEditingController nameController,
     required TextEditingController subController,
@@ -178,18 +181,23 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
     required Color buttonColor,
     String? oldImageUrl,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      decoration: BoxDecoration(
+        // Background adaptif
+        color: Theme.of(context).scaffoldBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SingleChildScrollView(
         child: Column(
           children: [
             Text(title,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black)),
             const SizedBox(height: 15),
             Obx(
               () => GestureDetector(
@@ -198,7 +206,8 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
                   width: double.infinity,
                   height: 150,
                   decoration: BoxDecoration(
-                    color: Colors.grey[200],
+                    // Warna box gambar adaptif
+                    color: isDark ? Colors.grey[800] : Colors.grey[200],
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(color: Colors.grey),
                   ),
@@ -211,8 +220,10 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
                                 fit: BoxFit.cover,
                               ),
                             )
-                          : const Center(
-                              child: Icon(Icons.camera_alt, size: 40),
+                          : Center(
+                              child: Icon(Icons.camera_alt,
+                                  size: 40,
+                                  color: isDark ? Colors.white70 : Colors.grey),
                             )
                       : ClipRRect(
                           borderRadius: BorderRadius.circular(10),
@@ -225,15 +236,17 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
               ),
             ),
             const SizedBox(height: 15),
-            _textField(nameController, "Nama Service", Icons.label),
-            _textField(subController, "Subtitle", Icons.subtitles),
-            _textField(priceController, "Price", Icons.money,
+            _textField(context, nameController, "Nama Service", Icons.label),
+            _textField(context, subController, "Subtitle", Icons.subtitles),
+            _textField(context, priceController, "Price", Icons.money,
                 isNumber: true),
-            _textField(descController, "Description", Icons.description,
+            _textField(context, descController, "Description", Icons.description,
                 maxLines: 3),
             const SizedBox(height: 12),
             Obx(
               () => DropdownButtonFormField<String>(
+                dropdownColor: isDark ? Colors.grey[800] : Colors.white,
+                style: TextStyle(color: isDark ? Colors.white : Colors.black),
                 value: controller.selectedCategory.value.isEmpty
                     ? null
                     : controller.selectedCategory.value,
@@ -247,9 +260,11 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
                     .toList(),
                 onChanged: (value) =>
                     controller.selectedCategory.value = value ?? '',
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Kategori',
-                  border: OutlineInputBorder(),
+                  labelStyle:
+                      TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ),
@@ -259,8 +274,7 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: buttonColor),
+                  style: ElevatedButton.styleFrom(backgroundColor: buttonColor),
                   onPressed: controller.isLoading.value ? null : onSubmit,
                   child: controller.isLoading.value
                       ? const CircularProgressIndicator(color: Colors.white)
@@ -278,21 +292,28 @@ class AdminDashboradView extends GetView<AdminDashboradController> {
   }
 
   Widget _textField(
+    BuildContext context,
     TextEditingController ctrl,
     String label,
     IconData icon, {
     bool isNumber = false,
     int maxLines = 1,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
         controller: ctrl,
+        style: TextStyle(color: isDark ? Colors.white : Colors.black),
         keyboardType: isNumber ? TextInputType.number : TextInputType.text,
         maxLines: maxLines,
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(icon),
+          labelStyle: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+          prefixIcon: Icon(icon, color: isDark ? Colors.white70 : Colors.black54),
+          filled: true,
+          fillColor: isDark ? Colors.grey[900] : Colors.grey[100],
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         ),
       ),

@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:loundry_app/app/modules/auth/controllers/auth_controller.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key, required this.onLoginTap});
   final VoidCallback onLoginTap;
-
-  // 2. TAMBAHKAN KE CONSTRUCTOR
 
   @override
   State<RegisterView> createState() => _RegisterViewState();
@@ -31,9 +28,10 @@ class _RegisterViewState extends State<RegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -42,53 +40,51 @@ class _RegisterViewState extends State<RegisterView> {
             children: [
               const SizedBox(height: 100),
 
-              /// TITLE
-              const Text(
+              Text(
                 'Sign Up',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Theme.of(context).textTheme.titleLarge?.color,
                 ),
               ),
 
               const SizedBox(height: 8),
 
-              /// SUBTITLE
               Text(
                 'Create your account to get started',
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.grey.shade600,
+                  color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
                 ),
               ),
 
               const SizedBox(height: 40),
 
-              /// FULL NAME
               _inputField(
                 label: 'Full Name',
                 hint: 'John Doe',
                 controller: nameController,
+                context: context,
               ),
 
               const SizedBox(height: 20),
 
-              /// EMAIL
               _inputField(
                 label: 'Email',
                 hint: 'example@gmail.com',
                 controller: emailController,
+                context: context,
               ),
 
               const SizedBox(height: 20),
 
-              /// PASSWORD
               _inputField(
                 label: 'Password',
                 hint: '••••••••••••',
                 controller: passwordController,
                 obscureText: isPasswordHidden,
+                context: context,
                 suffixIcon: IconButton(
                   icon: Icon(
                     isPasswordHidden
@@ -104,71 +100,63 @@ class _RegisterViewState extends State<RegisterView> {
                 ),
               ),
 
-      
               const SizedBox(height: 32),
 
-              /// SIGN UP BUTTON
               SizedBox(
-              width: double.infinity,
-              height: 56,
-              // 2. Gunakan Obx agar tombol reaktif terhadap isLoading
-              child: Obx(() => ElevatedButton(
-                onPressed: authController.isLoading.value
-                    ? null // Nonaktifkan tombol jika sedang loading
-                    : () {
-                        // 3. Panggil fungsi register
-                        if (emailController.text.isNotEmpty && 
-                            passwordController.text.isNotEmpty) {
+                width: double.infinity,
+                height: 56,
+                child: Obx(() => ElevatedButton(
+                  onPressed: authController.isLoading.value
+                      ? null
+                      : () {
+                          // Logika dipindah ke controller sepenuhnya
                           authController.register(
                             emailController.text.trim(),
                             passwordController.text.trim(),
+                            nameController.text.trim(), // Pastikan parameter ini ada di controller
                           );
-                        } else {
-                          Get.snackbar("Error", "Please fill all fields");
-                        }
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF5B8DEF),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF5B8DEF),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28),
+                    ),
                   ),
-                ),
-                child: authController.isLoading.value
-                    ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
+                  child: authController.isLoading.value
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'Create Account',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      )
-                    : const Text(
-                        'Create Account',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-              )),
-            ),
+                )),
+              ),
 
               const SizedBox(height: 32),
 
-              /// SIGN IN LINK
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     "Already have an account? ",
                     style: TextStyle(
-                      color: Colors.grey.shade700,
+                      color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade700,
                       fontSize: 14,
                     ),
                   ),
                   GestureDetector(
-                    onTap:widget.onLoginTap,
+                    onTap: widget.onLoginTap,
                     child: const Text(
                       'Sign In',
                       style: TextStyle(
@@ -180,7 +168,6 @@ class _RegisterViewState extends State<RegisterView> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 24),
             ],
           ),
@@ -189,38 +176,41 @@ class _RegisterViewState extends State<RegisterView> {
     );
   }
 
-  /// ================= INPUT FIELD (SAMA DENGAN SIGN IN) =================
   Widget _inputField({
     required String label,
     required String hint,
     required TextEditingController controller,
+    required BuildContext context,
     bool obscureText = false,
     Widget? suffixIcon,
   }) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 14,
-            color: Colors.black,
+            color: Theme.of(context).textTheme.bodyLarge?.color,
           ),
         ),
         const SizedBox(height: 10),
         TextField(
           controller: controller,
           obscureText: obscureText,
+          style: TextStyle(color: isDarkMode ? Colors.white : Colors.black),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              color: Colors.grey.shade400,
+              color: isDarkMode ? Colors.grey.shade500 : Colors.grey.shade400,
               fontSize: 14,
             ),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: const Color(0xFFF7F7F7),
+            fillColor: isDarkMode ? Colors.grey.shade900 : const Color(0xFFF7F7F7),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 20,
               vertical: 18,
@@ -232,7 +222,7 @@ class _RegisterViewState extends State<RegisterView> {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(
-                color: Colors.grey.shade200,
+                color: isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200,
                 width: 1,
               ),
             ),

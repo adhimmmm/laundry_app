@@ -32,6 +32,7 @@ class ProfileController extends GetxController {
 
   String get name => userData['name'] ?? 'User';
   String get email => userData['email'] ?? '-';
+  bool get isLoggedIn => _client.auth.currentUser != null;
 
   Future<void> fetchUserProfile(String userId) async {
     try {
@@ -45,7 +46,7 @@ class ProfileController extends GetxController {
       userData.value = data;
       isAdmin.value = (data['role'] == 'admin');
     } catch (e) {
-      print('Error: $e');
+      debugPrint('Error: $e');
     } finally {
       isLoading.value = false;
     }

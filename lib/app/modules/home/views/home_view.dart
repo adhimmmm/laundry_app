@@ -4,6 +4,7 @@ import 'package:loundry_app/app/core/services/detail_services.dart';
 import 'package:loundry_app/app/modules/home/controllers/home_controller.dart';
 import 'package:loundry_app/app/modules/laundry_map/bindings/laundry_map_binding.dart';
 import 'package:loundry_app/app/modules/laundry_map/views/laundry_map_view.dart';
+import 'package:loundry_app/app/modules/notification/controllers/notification_controller.dart';
 import 'package:loundry_app/app/routes/app_pages.dart';
 import '../../../core/services/theme_service.dart';
 
@@ -18,6 +19,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     final HomeController homeC = Get.find<HomeController>();
+    final NotificationController notifController = Get.put(NotificationController());
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -73,18 +75,14 @@ class _HomeViewState extends State<HomeView> {
                                     },
                                     child: const Row(
                                       children: [
-                                        Icon(
-                                          Icons.location_on_rounded,
-                                          color: Colors.white70,
-                                          size: 14,
-                                        ),
+                                        Icon(Icons.location_on_rounded,
+                                            color: Colors.white70, size: 14),
                                         SizedBox(width: 4),
                                         Text(
                                           'New York, USA',
                                           style: TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 13,
-                                          ),
+                                              color: Colors.white70,
+                                              fontSize: 13),
                                         ),
                                       ],
                                     ),
@@ -94,12 +92,15 @@ class _HomeViewState extends State<HomeView> {
                             ),
                             Row(
                               children: [
-                                _buildHeaderIconButton(
-                                  icon: Icons.notifications_none_rounded,
-                                  hasNotification: true,
-                                  onTap: () => Get.toNamed(Routes.NOTIFICATION),
-                                  isDark: isDark,
-                                ),
+                                Obx(() => _buildHeaderIconButton(
+                                      icon: Icons.notifications_none_rounded,
+                                      hasNotification: notifController.hasUnread,
+                                      onTap: () {
+                                        notifController.markAllAsRead();
+                                        Get.toNamed(Routes.NOTIFICATION);
+                                      },
+                                      isDark: isDark,
+                                    )),
                                 const SizedBox(width: 8),
                                 GestureDetector(
                                   onTap: () async {
@@ -133,9 +134,8 @@ class _HomeViewState extends State<HomeView> {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(
-                                  isDark ? 0.3 : 0.06,
-                                ),
+                                color: Colors.black
+                                    .withOpacity(isDark ? 0.3 : 0.06),
                                 blurRadius: 16,
                                 offset: const Offset(0, 4),
                               ),
@@ -154,10 +154,9 @@ class _HomeViewState extends State<HomeView> {
                               Expanded(
                                 child: TextField(
                                   style: TextStyle(
-                                    color: isDark
-                                        ? Colors.white
-                                        : Colors.black87,
-                                  ),
+                                      color: isDark
+                                          ? Colors.white
+                                          : Colors.black87),
                                   decoration: InputDecoration(
                                     hintText: 'Search service, provider...',
                                     hintStyle: TextStyle(
@@ -194,21 +193,16 @@ class _HomeViewState extends State<HomeView> {
                 const SizedBox(height: 20),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Special Offers',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
+                  child: Text(
+                    'Special Offers',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
                   ),
                 ),
+                const SizedBox(height: 12),
                 SizedBox(
                   height: 160,
                   child: ListView(
@@ -230,195 +224,95 @@ class _HomeViewState extends State<HomeView> {
                         discount: 'Free Delivery',
                         isDark: isDark,
                       ),
-                      const SizedBox(width: 16),
-                      _promoImageCard(
-                        image: 'assets/images/1.jpg',
-                        badge: 'Premium',
-                        title: 'Professional Clean',
-                        discount: '30% OFF',
-                        isDark: isDark,
-                      ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 28),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: isDark ? Colors.grey[850] : Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(
-                                isDark ? 0.3 : 0.04,
-                              ),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.grey[850] : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: GridView.count(
+                      crossAxisCount: 3,
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        _ServiceItem(
+                          imagePath: 'assets/home/washing-machine.png',
+                          label: 'Washing',
+                          isDark: isDark,
+                          onTap: () => Get.to(() => const DetailServiceView(),
+                              arguments: {
+                                'name': 'Washing Service',
+                                'image': 'assets/home/washing-machine.png',
+                                'price': 'Rp 10.000 / kg'
+                              }),
                         ),
-                        child: GridView.count(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          children: [
-                            _ServiceItem(
-                              imagePath: 'assets/home/washing-machine.png',
-                              label: 'Washing',
-                              isDark: isDark,
-                              onTap: () => Get.to(
-                                () => const DetailServiceView(),
-                                arguments: {
-                                  'name': 'Washing Service',
-                                  'image': 'assets/home/washing-machine.png',
-                                  'price': 'Rp 10.000 / kg',
-                                  'subtitle': 'Clean & Fresh',
-                                  'description':
-                                      'Layanan cuci menggunakan mesin otomatis modern dengan deterjen cair premium yang menjaga serat kain tetap awet.',
-                                },
-                              ),
-                            ),
-                            _ServiceItem(
-                              imagePath: 'assets/home/iron.png',
-                              label: 'Ironing',
-                              isDark: isDark,
-                              onTap: () => Get.to(
-                                () => const DetailServiceView(),
-                                arguments: {
-                                  'name': 'Ironing Only',
-                                  'image': 'assets/home/iron.png',
-                                  'price': 'Rp 7.000 / kg',
-                                  'subtitle': 'Smooth & Neat',
-                                  'description':
-                                      'Penyetrikaan rapi menggunakan setrika uap untuk memastikan semua lipatan hilang tanpa merusak bahan pakaian.',
-                                },
-                              ),
-                            ),
-                            _ServiceItem(
-                              imagePath: 'assets/home/dry-cleaning.png',
-                              label: 'Dry Clean',
-                              isDark: isDark,
-                              onTap: () => Get.to(
-                                () => const DetailServiceView(),
-                                arguments: {
-                                  'name': 'Dry Cleaning',
-                                  'image': 'assets/home/dry-cleaning.png',
-                                  'price': 'Rp 25.000 / pcs',
-                                  'subtitle': 'Special Treatment',
-                                  'description':
-                                      'Pencucian khusus untuk jas, kebaya, atau bahan sensitif lainnya tanpa menggunakan air (solvent based).',
-                                },
-                              ),
-                            ),
-                            _ServiceItem(
-                              imagePath: 'assets/home/power-washing.png',
-                              label: 'Carpet',
-                              isDark: isDark,
-                              onTap: () => Get.to(
-                                () => const DetailServiceView(),
-                                arguments: {
-                                  'name': 'Carpet Cleaning',
-                                  'image': 'assets/home/power-washing.png',
-                                  'price': 'Rp 15.000 / m2',
-                                  'subtitle': 'Deep Clean',
-                                  'description':
-                                      'Pembersihan karpet menyeluruh hingga ke sela-sela benang untuk menghilangkan debu dan tungau.',
-                                },
-                              ),
-                            ),
-                            _ServiceItem(
-                              imagePath: 'assets/home/sofa.png',
-                              label: 'Sofa',
-                              isDark: isDark,
-                              onTap: () => Get.to(
-                                () => const DetailServiceView(),
-                                arguments: {
-                                  'name': 'Sofa Cleaning',
-                                  'image': 'assets/home/sofa.png',
-                                  'price': 'Rp 50.000 / seat',
-                                  'subtitle': 'Hygienic Sofa',
-                                  'description':
-                                      'Cuci sofa di tempat menggunakan alat vakum khusus untuk hasil bersih dan kering dengan cepat.',
-                                },
-                              ),
-                            ),
-                            _ServiceItem(
-                              imagePath: 'assets/home/shoe.png',
-                              label: 'Shoe',
-                              isDark: isDark,
-                              onTap: () => Get.to(
-                                () => const DetailServiceView(),
-                                arguments: {
-                                  'name': 'Shoe Care',
-                                  'image': 'assets/home/shoe.png',
-                                  'price': 'Rp 12.000 / kg',
-                                  'subtitle': 'Dust Free',
-                                  'description':
-                                      'Cuci sepatu tebal maupun tipis agar ruangan kembali segar dan bebas debu pemicu alergi.',
-                                },
-                              ),
-                            ),
-                          ],
+                        _ServiceItem(
+                          imagePath: 'assets/home/iron.png',
+                          label: 'Ironing',
+                          isDark: isDark,
+                          onTap: () => Get.to(() => const DetailServiceView(),
+                              arguments: {
+                                'name': 'Ironing Only',
+                                'image': 'assets/home/iron.png',
+                                'price': 'Rp 7.000 / kg'
+                              }),
                         ),
-                      ),
-                    ],
+                        _ServiceItem(
+                          imagePath: 'assets/home/dry-cleaning.png',
+                          label: 'Dry Clean',
+                          isDark: isDark,
+                          onTap: () => Get.to(() => const DetailServiceView(),
+                              arguments: {
+                                'name': 'Dry Cleaning',
+                                'image': 'assets/home/dry-cleaning.png',
+                                'price': 'Rp 25.000 / pcs'
+                              }),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 28),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _sectionTitle(
-                        'Popular Services',
-                        isDark,
-                        onSeeAll: () {
-                          Get.toNamed(Routes.EXPLORE);
-                        },
-                      ),
+                      _sectionTitle('Popular Services', isDark, onSeeAll: () {
+                        Get.toNamed(Routes.EXPLORE);
+                      }),
                       const SizedBox(height: 12),
                       Obx(() {
                         if (homeC.isLoading.value) {
                           return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        if (homeC.popularServices.isEmpty) {
-                          return const Text('No popular services');
+                              child: CircularProgressIndicator());
                         }
                         return Column(
                           children: homeC.popularServices.map((service) {
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 12),
                               child: InkWell(
-                                borderRadius: BorderRadius.circular(16),
-                                onTap: () {
-                                  Get.toNamed(
+                                onTap: () => Get.toNamed(
                                     Routes.POPULAR_SERVICES_DETAIL,
-                                    arguments: service,
-                                  );
-                                },
+                                    arguments: service),
                                 child: _popularProvider(
-                                  service: service,
-                                  isDark: isDark,
-                                ),
+                                    service: service, isDark: isDark),
                               ),
                             );
                           }).toList(),
                         );
                       }),
-                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
+                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -464,34 +358,21 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _sectionTitle(
-    String title,
-    bool isDark, {
-    VoidCallback? onSeeAll,
-    bool showSeeAll = true,
-  }) {
+  Widget _sectionTitle(String title, bool isDark, {VoidCallback? onSeeAll}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black,
-          ),
-        ),
-        if (showSeeAll)
-          GestureDetector(
-            onTap: onSeeAll,
-            child: Text(
-              'See All',
+        Text(title,
+            style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black)),
+        GestureDetector(
+          onTap: onSeeAll,
+          child: const Text('See All',
               style: TextStyle(
-                color: const Color(0xFF5B8DEF),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
+                  color: Color(0xFF5B8DEF), fontWeight: FontWeight.w600)),
+        ),
       ],
     );
   }
@@ -507,141 +388,50 @@ class _HomeViewState extends State<HomeView> {
       width: 280,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.5 : 0.1),
-            blurRadius: 20,
-            spreadRadius: 2,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(image),
-                  fit: BoxFit.cover,
-                  colorFilter: isDark
-                      ? ColorFilter.mode(
-                          Colors.black.withOpacity(0.2),
-                          BlendMode.darken,
-                        )
-                      : null,
-                ),
-              ),
-            ),
+            Image.asset(image, fit: BoxFit.cover, width: 280, height: 160),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: isDark
-                      ? [
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.4),
-                          Colors.black.withOpacity(0.85),
-                        ]
-                      : [
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.2),
-                          Colors.black.withOpacity(0.75),
-                        ],
-                  stops: const [0.0, 0.5, 1.0],
+                  colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
                 ),
               ),
             ),
-            if (isDark)
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Colors.blue.withOpacity(0.1), Colors.transparent],
-                  ),
-                ),
-              ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [const Color(0xFFFF9F43), const Color(0xFFFF6B35)]),
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFFFF9F43).withOpacity(0.4),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      badge,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(6)),
+                    child: Text(badge,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold)),
                   ),
                   const Spacer(),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      shadows: [Shadow(color: Colors.black.withOpacity(0.5), blurRadius: 4, offset: const Offset(0, 2))],
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.white.withOpacity(0.15) : Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.white.withOpacity(0.3), width: 1.5),
-                    ),
-                    child: Text(
-                      discount,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                        shadows: [
-                          Shadow(
-                            color: isDark ? Colors.blue.withOpacity(0.5) : Colors.black.withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  Text(title,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600)),
+                  Text(discount,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold)),
                 ],
-              ),
-            ),
-            Positioned(
-              top: -20,
-              right: -20,
-              child: Container(
-                width: 100,
-                height: 100,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [Colors.white.withOpacity(isDark ? 0.15 : 0.25), Colors.transparent],
-                  ),
-                ),
               ),
             ),
           ],
@@ -650,48 +440,32 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
-  Widget _popularProvider({
-    required Map<String, dynamic> service,
-    required bool isDark,
-  }) {
+  Widget _popularProvider(
+      {required Map<String, dynamic> service, required bool isDark}) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: isDark ? Colors.grey[850] : Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? Colors.grey[800]! : const Color(0xFFF1F3F5),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(isDark ? 0.3 : 0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+            color: isDark ? Colors.grey[800]! : Colors.grey[200]!),
       ),
       child: Row(
         children: [
           Container(
-            width: 60,
-            height: 60,
+            width: 50,
+            height: 50,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              image: service['image_url'] != null && service['image_url'].toString().isNotEmpty
+              borderRadius: BorderRadius.circular(10),
+              image: service['image_url'] != null
                   ? DecorationImage(
                       image: NetworkImage(service['image_url']),
-                      fit: BoxFit.cover,
-                    )
+                      fit: BoxFit.cover)
                   : null,
-              color: isDark ? Colors.blue[900]!.withOpacity(0.3) : const Color(0xFF5B8DEF).withOpacity(0.1),
+              color: Colors.blue.withOpacity(0.1),
             ),
-            child: service['image_url'] == null || service['image_url'].toString().isEmpty
-                ? Icon(
-                    Icons.local_laundry_service_rounded,
-                    color: isDark ? Colors.blue[300] : const Color(0xFF5B8DEF),
-                    size: 28,
-                  )
+            child: service['image_url'] == null
+                ? const Icon(Icons.local_laundry_service, color: Colors.blue)
                 : null,
           ),
           const SizedBox(width: 12),
@@ -699,44 +473,17 @@ class _HomeViewState extends State<HomeView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  service['name'] ?? 'Service Name',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (service['subtitle'] != null && service['subtitle'].toString().isNotEmpty)
-                  Text(
-                    service['subtitle'],
+                Text(service['name'] ?? '',
                     style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: isDark ? Colors.grey[400] : Colors.grey[700],
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                const SizedBox(height: 4),
-                Text(
-                  service['price'] ?? 'Rp 0',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.blue[300] : const Color(0xFF5B8DEF),
-                  ),
-                ),
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87)),
+                Text(service['price'] ?? '',
+                    style: const TextStyle(
+                        color: Color(0xFF5B8DEF), fontWeight: FontWeight.w600)),
               ],
             ),
           ),
-          Icon(
-            Icons.arrow_forward_ios_rounded,
-            size: 16,
-            color: isDark ? Colors.blue[300] : const Color(0xFF5B8DEF),
-          ),
+          const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
         ],
       ),
     );
@@ -749,47 +496,30 @@ class _ServiceItem extends StatelessWidget {
   final VoidCallback onTap;
   final bool isDark;
 
-  const _ServiceItem({
-    required this.imagePath,
-    required this.label,
-    required this.onTap,
-    required this.isDark,
-  });
+  const _ServiceItem(
+      {required this.imagePath,
+      required this.label,
+      required this.onTap,
+      required this.isDark});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: isDark ? Colors.blue[900]!.withOpacity(0.3) : Colors.blue[50],
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Image.asset(
-              imagePath,
-              width: 40,
-              height: 40,
-              errorBuilder: (context, error, stackTrace) => Icon(
-                Icons.broken_image,
-                size: 40,
-                color: isDark ? Colors.grey[600] : Colors.grey,
-              ),
-            ),
+                color: isDark ? Colors.blue[900]!.withOpacity(0.2) : Colors.blue[50],
+                borderRadius: BorderRadius.circular(12)),
+            child: Image.asset(imagePath, width: 32, height: 32),
           ),
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: isDark ? Colors.grey[300] : Colors.black87,
-            ),
-          ),
+          const SizedBox(height: 4),
+          Text(label,
+              style: TextStyle(
+                  fontSize: 11, color: isDark ? Colors.white70 : Colors.black87)),
         ],
       ),
     );

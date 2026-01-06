@@ -276,6 +276,39 @@ class _HomeViewState extends State<HomeView> {
                                 'price': 'Rp 25.000 / pcs'
                               }),
                         ),
+                        _ServiceItem(
+                          imagePath: 'assets/home/power-washing.png',
+                          label: 'Power Washing',
+                          isDark: isDark,
+                          onTap: () => Get.to(() => const DetailServiceView(),
+                              arguments: {
+                                'name': 'Power Washing',
+                                'image': 'assets/home/power-washing.png',
+                                'price': 'Rp 50.000 / pcs'
+                              }),
+                        ),
+                        _ServiceItem(
+                          imagePath: 'assets/home/shoe.png',
+                          label: 'Shoe',
+                          isDark: isDark,
+                          onTap: () => Get.to(() => const DetailServiceView(),
+                              arguments: {
+                                'name': 'Shoe',
+                                'image': 'assets/home/shoe.png',
+                                'price': 'Rp 35.000 / pcs'
+                              }),
+                        ),
+                        _ServiceItem(
+                          imagePath: 'assets/home/sofa.png',
+                          label: 'Sofa',
+                          isDark: isDark,
+                          onTap: () => Get.to(() => const DetailServiceView(),
+                              arguments: {
+                                'name': 'Sofa',
+                                'image': 'assets/home/sofa.png',
+                                'price': 'Rp 50.000 / pcs'
+                              }),
+                        ),
                       ],
                     ),
                   ),

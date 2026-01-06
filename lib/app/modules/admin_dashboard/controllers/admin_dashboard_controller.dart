@@ -22,6 +22,7 @@ class AdminDashboradController extends GetxController {
   ].obs;
 
   var selectedCategory = ''.obs;
+  var filterCategory = 'All'.obs; // untuk filter chart
 
   @override
   void onInit() {
@@ -39,6 +40,79 @@ class AdminDashboradController extends GetxController {
     } finally {
       isLoading(false);
     }
+  }
+
+  // Computed properties untuk Dashboard Statistics
+  int get totalServices => listData.length;
+
+  int get totalByCategory {
+    if (filterCategory.value == 'All') return listData.length;
+    return listData
+        .where((item) => item['category'] == filterCategory.value)
+        .length;
+  }
+
+  double get averagePrice {
+    if (listData.isEmpty) return 0;
+    final total = listData.fold<double>(
+      0,
+      (sum, item) => sum + (double.tryParse(item['price'].toString()) ?? 0),
+    );
+    return total / listData.length;
+  }
+
+  Map<String, int> get categoryDistribution {
+    final distribution = <String, int>{};
+    for (var category in categories) {
+      if (category == 'All') continue;
+      distribution[category] =
+          listData.where((item) => item['category'] == category).length;
+    }
+    return distribution;
+  }
+
+  // Get filtered data berdasarkan kategori
+  List<Map<String, dynamic>> get filteredData {
+    if (filterCategory.value == 'All') return listData;
+    return listData
+        .where((item) => item['category'] == filterCategory.value)
+        .toList();
+  }
+
+  // Get recent services (untuk sparkline/timeline)
+  List<Map<String, dynamic>> get recentServices {
+    final sorted = List<Map<String, dynamic>>.from(listData);
+    sorted.sort((a, b) {
+      final aDate = DateTime.tryParse(a['created_at']?.toString() ?? '');
+      final bDate = DateTime.tryParse(b['created_at']?.toString() ?? '');
+      if (aDate == null || bDate == null) return 0;
+      return bDate.compareTo(aDate);
+    });
+    return sorted.take(5).toList();
+  }
+
+  // Get price range data
+  Map<String, int> get priceRangeDistribution {
+    final ranges = <String, int>{
+      '0-50k': 0,
+      '50k-100k': 0,
+      '100k-200k': 0,
+      '200k+': 0,
+    };
+
+    for (var item in listData) {
+      final price = double.tryParse(item['price'].toString()) ?? 0;
+      if (price < 50000) {
+        ranges['0-50k'] = (ranges['0-50k'] ?? 0) + 1;
+      } else if (price < 100000) {
+        ranges['50k-100k'] = (ranges['50k-100k'] ?? 0) + 1;
+      } else if (price < 200000) {
+        ranges['100k-200k'] = (ranges['100k-200k'] ?? 0) + 1;
+      } else {
+        ranges['200k+'] = (ranges['200k+'] ?? 0) + 1;
+      }
+    }
+    return ranges;
   }
 
   Future<void> deleteData(String id) async {

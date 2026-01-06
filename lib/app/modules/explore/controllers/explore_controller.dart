@@ -6,8 +6,12 @@ class ExploreController extends GetxController {
 
   var isLoading = true.obs;
   var services = <Map<String, dynamic>>[].obs;
-  var allServices = <Map<String, dynamic>>[]; // Store original data
+  var allServices = <Map<String, dynamic>>[]; 
   var searchQuery = ''.obs;
+  var sortBy = 'name'.obs;
+  var selectedFilter = 'all'.obs;
+  var selectedFilters = <String>[].obs;
+  var recentSearches = <String>[].obs;
 
   @override
   void onInit() {
@@ -15,96 +19,112 @@ class ExploreController extends GetxController {
     fetchServices();
   }
 
-  /// Fetch all services from Supabase
   Future<void> fetchServices() async {
     try {
       isLoading(true);
-      final data = await supabase
-          .from('laundry_services')
-          .select()
-          .order('created_at', ascending: false);
-
-      // Store original data
+      final data = await supabase.from('laundry_services').select().order('created_at', ascending: false);
       allServices = List<Map<String, dynamic>>.from(data);
-      
-      // Display all services initially
       services.assignAll(allServices);
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
     } finally {
       isLoading(false);
     }
   }
 
-  /// Search services by name
   Future<void> searchServices(String query) async {
     try {
       searchQuery.value = query;
-      
-      if (query.isEmpty) {
-        // Show all services when search is empty
-        services.assignAll(allServices);
-      } else {
-        // Filter services based on search query
-        final filteredServices = allServices.where((service) {
-          final name = service['name']?.toString().toLowerCase() ?? '';
-          final subtitle = service['subtitle']?.toString().toLowerCase() ?? '';
-          final searchLower = query.toLowerCase();
-          
-          // Search in both name and subtitle
-          return name.contains(searchLower) || subtitle.contains(searchLower);
-        }).toList();
-        
-        services.assignAll(filteredServices);
+      if (query.isNotEmpty && !recentSearches.contains(query)) {
+        recentSearches.insert(0, query);
+        if (recentSearches.length > 5) recentSearches.removeLast();
       }
+      applyFilters();
     } catch (e) {
-      Get.snackbar(
-        'Search Error',
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Search Error', e.toString(), snackPosition: SnackPosition.BOTTOM);
     }
   }
 
   void filterByCategory(String category) {
-  try {
-    final selected = category.trim().toLowerCase();
+    selectedFilter.value = category.toLowerCase();
+    applyFilters();
+  }
 
-    if (selected.isEmpty || selected == 'all') {
-      services.assignAll(allServices);
+  void toggleMultiFilter(String category) {
+    final cat = category.toLowerCase();
+    if (selectedFilters.contains(cat)) {
+      selectedFilters.remove(cat);
     } else {
-      services.assignAll(
-        allServices.where((service) {
-          final serviceCategory =
-              (service['category'] ?? '').toString().trim().toLowerCase();
-          return serviceCategory == selected;
-        }).toList(),
-      );
+      selectedFilters.add(cat);
+    }
+  }
+
+  void sortServices(String sortType) {
+    sortBy.value = sortType;
+    applyFilters();
+  }
+
+  void applyFilters() {
+    List<Map<String, dynamic>> result = List.from(allServices);
+
+    if (selectedFilter.value != 'all') {
+      result = result.where((service) {
+        final cat = (service['category'] ?? '').toString().trim().toLowerCase();
+        return cat == selectedFilter.value;
+      }).toList();
     }
 
+    if (selectedFilters.isNotEmpty) {
+      result = result.where((service) {
+        final cat = (service['category'] ?? '').toString().trim().toLowerCase();
+        return selectedFilters.contains(cat);
+      }).toList();
+    }
+
+    if (searchQuery.value.isNotEmpty) {
+      final searchLower = searchQuery.value.toLowerCase();
+      result = result.where((service) {
+        final name = service['name']?.toString().toLowerCase() ?? '';
+        final subtitle = service['subtitle']?.toString().toLowerCase() ?? '';
+        return name.contains(searchLower) || subtitle.contains(searchLower);
+      }).toList();
+    }
+
+    if (sortBy.value == 'name') {
+      result.sort((a, b) => (a['name'] ?? '').toString().compareTo((b['name'] ?? '').toString()));
+    } else if (sortBy.value == 'price_asc') {
+      result.sort((a, b) {
+        final priceA = double.tryParse((a['price'] ?? '0').toString().replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
+        final priceB = double.tryParse((b['price'] ?? '0').toString().replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
+        return priceA.compareTo(priceB);
+      });
+    } else if (sortBy.value == 'price_desc') {
+      result.sort((a, b) {
+        final priceA = double.tryParse((a['price'] ?? '0').toString().replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
+        final priceB = double.tryParse((b['price'] ?? '0').toString().replaceAll(RegExp(r'[^\d.]'), '')) ?? 0;
+        return priceB.compareTo(priceA);
+      });
+    }
+
+    services.assignAll(result);
+  }
+
+  void selectRecentSearch(String query) {
+    searchQuery.value = query;
+    applyFilters();
+  }
+
+  void clearAllFilters() {
     searchQuery.value = '';
-  } catch (e) {
-    Get.snackbar(
-      'Filter Error',
-      e.toString(),
-      snackPosition: SnackPosition.BOTTOM,
-    );
-  }
-}
-
-
-  /// Refresh services
-  Future<void> refreshServices() async {
-    await fetchServices();
+    selectedFilter.value = 'all';
+    selectedFilters.clear();
+    sortBy.value = 'name';
+    applyFilters();
   }
 
-  /// Clear search
+  Future<void> refreshServices() => fetchServices();
   void clearSearch() {
     searchQuery.value = '';
-    services.assignAll(allServices);
+    applyFilters();
   }
 }
